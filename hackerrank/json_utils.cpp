@@ -1,8 +1,22 @@
 #include "json_utils.h"
 
 #include <algorithm>
+#include <type_traits>
 
 const json_spirit::Value& get_field(const std::string& jpath, const std::string& fieldName, const json_spirit::Object& obj)
+{
+    auto it = std::find_if(obj.begin(), obj.end(), [&fieldName](const json_spirit::Pair& p)
+    {
+        return p.name_ == fieldName;
+    });
+    if (it == obj.end())
+    {
+        throw "Can't find field by '" + jpath, "'";
+    }
+    return it->value_;
+}
+
+json_spirit::Value& get_field(const std::string& jpath, const std::string& fieldName, json_spirit::Object& obj)
 {
     auto it = std::find_if(obj.begin(), obj.end(), [&fieldName](const json_spirit::Pair& p)
     {
@@ -28,117 +42,38 @@ const json_spirit::wValue& get_field(const std::wstring& jpath, const std::wstri
     return it->value_;
 }
 
-template<typename Json_t, typename Value_t>
-struct JsonResultType
+json_spirit::wValue& get_field(const std::wstring& jpath, const std::wstring& fieldName, json_spirit::wObject& obj)
 {
-    using type = const Json_t&;
+    auto it = std::find_if(obj.begin(), obj.end(), [&fieldName](const json_spirit::wPair& p)
+    {
+        return p.name_ == fieldName;
+    });
+    if (it == obj.end())
+    {
+        throw L"Can't find field by '" + jpath, L"'";
+    }
+    return it->value_;
+}
+
+template<typename Result_t, typename Value_t>
+struct ResultType
+{
+    using type = std::remove_reference_t<Value_t>&;
 };
 
-template<>
-struct JsonResultType<int, json_spirit::Value>
+template<typename Value_t>
+struct ResultType<json_spirit::Object, Value_t>
 {
-    using type = int;
-};
-
-template<>
-struct JsonResultType<bool, json_spirit::Value>
-{
-    using type = bool;
-};
-
-template<>
-struct JsonResultType<std::int64_t, json_spirit::Value>
-{
-    using type = std::int64_t;
-};
-
-template<>
-struct JsonResultType<std::uint64_t, json_spirit::Value>
-{
-    using type = std::uint64_t;
-};
-
-template<>
-struct JsonResultType<double, json_spirit::Value>
-{
-    using type = double;
-};
-
-template<>
-struct JsonResultType<std::wstring, json_spirit::wValue>
-{
-    using type = const std::wstring&;
+    using type = std::conditional_t<std::is_const_v<Value_t>, const json_spirit::Object&, json_spirit::Object&>;
 };
 
 template<typename Result_t, typename Value_t>
-typename JsonResultType<Result_t, Value_t>::type value_2_result(const Value_t& value)
-{
-    Result_t res;
-    std::remove_cv_t<std::remove_reference_t<typename JsonResultType<Result_t, Value_t>::type>> t;
-    throw "Not implemented.";
-}
+using ResultType_t = typename ResultType<Result_t, Value_t>::type;
 
-template<>
-inline typename JsonResultType<json_spirit::Value,
-    json_spirit::Value>::type value_2_result<json_spirit::Value>(const json_spirit::Value& value)
+template<typename Result_t, typename Value_t>
+inline ResultType_t<Result_t, Value_t> value_2_result(Value_t& value)
 {
     return value;
-}
-
-template<>
-inline typename JsonResultType<json_spirit::Object,
-    json_spirit::Value>::type value_2_result<json_spirit::Object>(const json_spirit::Value& value)
-{
-    return value.get_obj();
-}
-
-template<>
-inline typename JsonResultType<json_spirit::Array,
-    json_spirit::Value>::type value_2_result<json_spirit::Array>(const json_spirit::Value& value)
-{
-    return value.get_array();
-}
-
-template<>
-inline typename JsonResultType<std::string,
-    json_spirit::Value>::type value_2_result<std::string>(const json_spirit::Value& value)
-{
-    return value.get_str();
-}
-
-template<>
-inline typename JsonResultType<int,
-    json_spirit::Value>::type value_2_result<int>(const json_spirit::Value& value)
-{
-    return value.get_int();
-}
-
-template<>
-inline typename JsonResultType<std::int64_t,
-    json_spirit::Value>::type value_2_result<std::int64_t>(const json_spirit::Value& value)
-{
-    return value.get_int64();
-}
-
-template<>
-inline typename JsonResultType<std::uint64_t,
-    json_spirit::Value>::type value_2_result<std::uint64_t>(const json_spirit::Value& value)
-{
-    return value.get_uint64();
-}
-
-template<>
-inline typename JsonResultType<bool,
-    json_spirit::Value>::type value_2_result<bool>(const json_spirit::Value& value)
-{
-    return value.get_bool();
-}
-
-template<>
-inline typename JsonResultType<double,
-    json_spirit::Value>::type value_2_result<double>(const json_spirit::Value& value)
-{
-    return value.get_real();
 }
 
 inline wchar_t widest(char ch)
@@ -152,8 +87,7 @@ inline wchar_t widest(wchar_t ch)
 }
 
 template<typename Result_t, typename String_t, typename Value_t>
-typename JsonResultType<Result_t,
-    json_spirit::Value>::type get_value(const String_t& jpath, const Value_t& value)
+ResultType_t<Result_t, Value_t> get_value(const String_t& jpath, Value_t& value)
 {
     if (jpath.empty())
     {
@@ -210,67 +144,22 @@ const json_spirit::Value& get_value(const std::string& jpath, const json_spirit:
     return get_value<json_spirit::Value>(jpath, value);
 }
 
-const json_spirit::wObject& get_obj(const std::wstring& jpath, const json_spirit::wValue& value)
+json_spirit::Value& get_value(const std::string& jpath, json_spirit::Value& value)
 {
-    return get_value<json_spirit::wObject>(jpath, value);
+    return get_value<json_spirit::Value>(jpath, value);
 }
 
-const json_spirit::Array& get_array(const std::string& jpath, const json_spirit::Value& value)
+const json_spirit::wValue& get_value(const std::wstring& jpath, const json_spirit::wValue& value)
 {
-    return get_value<json_spirit::Array>(jpath, value);
+    return get_value<json_spirit::wValue>(jpath, value);
 }
 
-const json_spirit::wArray& get_array(const std::wstring& jpath, const json_spirit::wValue& value)
-{
-    return get_value<json_spirit::wArray>(jpath, value);
-}
-
-const std::string& get_str(const std::string& jpath, const json_spirit::Value& value)
-{
-    return get_value<std::string>(jpath, value);
-}
-
-bool get_bool(const std::wstring& jpath, const json_spirit::wValue& value)
-{
-    return get_value<bool>(jpath, value);
-}
-
-int get_int(const std::string& jpath, const json_spirit::Value& value)
-{
-    return get_value<int>(jpath, value);
-}
-
-int get_int(const std::wstring& jpath, const json_spirit::wValue& value)
-{
-    return get_value<int>(jpath, value);
-}
-
-std::int64_t get_int64(const std::string& jpath, const json_spirit::Value& value)
-{
-    return get_value<std::int64_t>(jpath, value);
-}
-
-std::int64_t get_int64(const std::wstring& jpath, const json_spirit::wValue& value)
-{
-    return get_value<std::int64_t>(jpath, value);
-}
-
-std::uint64_t get_uint64(const std::string& jpath, const json_spirit::Value& value)
-{
-    return get_value<std::uint64_t>(jpath, value);
-}
-
-std::uint64_t get_uint64(const std::wstring& jpath, const json_spirit::wValue& value)
-{
-    return get_value<std::uint64_t>(jpath, value);
-}
-
-double get_real(const std::string& jpath, const json_spirit::Value& value)
-{
-    return get_value<double>(jpath, value);
-}
-
-double get_real(const std::wstring& jpath, const json_spirit::wValue& value)
-{
-    return get_value<double>(jpath, value);
-}
+//const json_spirit::Object& get_obj(const std::string& jpath, const json_spirit::Value& value)
+//{
+//    return get_value<json_spirit::Object>(jpath, value);
+//}
+//
+//json_spirit::Object& get_obj(const std::string& jpath, json_spirit::Value& value)
+//{
+//    return get_value<json_spirit::Object>(jpath, value);
+//}
