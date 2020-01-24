@@ -29,6 +29,26 @@ json_spirit::Value& get_field(const std::string& jpath, const std::string& field
     return it->value_;
 }
 
+const json_spirit::mValue& get_field(const std::string& jpath, const std::string& fieldName, const json_spirit::mObject& obj)
+{
+    auto it = obj.find(fieldName);
+    if (it == obj.end())
+    {
+        throw "Can't find field by '" + jpath, "'";
+    }
+    return it->second;
+}
+
+json_spirit::mValue& get_field(const std::string& jpath, const std::string& fieldName, json_spirit::mObject& obj)
+{
+    auto it = obj.find(fieldName);
+    if (it == obj.end())
+    {
+        throw "Can't find field by '" + jpath, "'";
+    }
+    return it->second;
+}
+
 const json_spirit::wValue& get_field(const std::wstring& jpath, const std::wstring& fieldName, const json_spirit::wObject& obj)
 {
     auto it = std::find_if(obj.begin(), obj.end(), [&fieldName](const json_spirit::wPair& p)
@@ -55,26 +75,120 @@ json_spirit::wValue& get_field(const std::wstring& jpath, const std::wstring& fi
     return it->value_;
 }
 
+const json_spirit::wmValue& get_field(const std::wstring& jpath, const std::wstring& fieldName, const json_spirit::wmObject& obj)
+{
+    auto it = obj.find(fieldName);
+    if (it == obj.end())
+    {
+        throw L"Can't find field by '" + jpath, L"'";
+    }
+    return it->second;
+}
+
+json_spirit::wmValue& get_field(const std::wstring& jpath, const std::wstring& fieldName, json_spirit::wmObject& obj)
+{
+    auto it = obj.find(fieldName);
+    if (it == obj.end())
+    {
+        throw L"Can't find field by '" + jpath, L"'";
+    }
+    return it->second;
+}
+
 template<typename Result_t, typename Value_t>
 struct ResultType
 {
-    using type = std::remove_reference_t<Value_t>&;
+    using type = Value_t&;
+    static type get_value(Value_t& v)
+    {
+        return v;
+    }
 };
 
 template<typename Value_t>
 struct ResultType<json_spirit::Object, Value_t>
 {
     using type = std::conditional_t<std::is_const_v<Value_t>, const json_spirit::Object&, json_spirit::Object&>;
+    static type get_value(Value_t& v)
+    {
+        return v.get_obj();
+    }
 };
+
+template<typename Value_t>
+struct ResultType<json_spirit::wObject, Value_t>
+{
+    using type = std::conditional_t<std::is_const_v<Value_t>, const json_spirit::wObject&, json_spirit::wObject&>;
+    static type get_value(Value_t& v)
+    {
+        return v.get_obj();
+    }
+};
+
+template<typename Value_t>
+struct ResultType<json_spirit::mObject, Value_t>
+{
+    using type = std::conditional_t<std::is_const_v<Value_t>, const json_spirit::mObject&, json_spirit::mObject&>;
+    static type get_value(Value_t& v)
+    {
+        return v.get_obj();
+    }
+};
+
+template<typename Value_t>
+struct ResultType<json_spirit::wmObject, Value_t>
+{
+    using type = std::conditional_t<std::is_const_v<Value_t>, const json_spirit::wmObject&, json_spirit::wmObject&>;
+    static type get_value(Value_t& v)
+    {
+        return v.get_obj();
+    }
+};
+
+/*********************/
+template<typename Value_t>
+struct ResultType<json_spirit::Array, Value_t>
+{
+    using type = std::conditional_t<std::is_const_v<Value_t>, const json_spirit::Array&, json_spirit::Array&>;
+    static type get_value(Value_t& v)
+    {
+        return v.get_array();
+    }
+};
+
+template<typename Value_t>
+struct ResultType<json_spirit::wArray, Value_t>
+{
+    using type = std::conditional_t<std::is_const_v<Value_t>, const json_spirit::wArray&, json_spirit::wArray&>;
+    static type get_value(Value_t& v)
+    {
+        return v.get_array();
+    }
+};
+
+template<typename Value_t>
+struct ResultType<json_spirit::mArray, Value_t>
+{
+    using type = std::conditional_t<std::is_const_v<Value_t>, const json_spirit::mArray&, json_spirit::mArray&>;
+    static type get_value(Value_t& v)
+    {
+        return v.get_array();
+    }
+};
+
+template<typename Value_t>
+struct ResultType<json_spirit::wmArray, Value_t>
+{
+    using type = std::conditional_t<std::is_const_v<Value_t>, const json_spirit::wmArray&, json_spirit::wmArray&>;
+    static type get_value(Value_t& v)
+    {
+        return v.get_array();
+    }
+};
+/*********************/
 
 template<typename Result_t, typename Value_t>
 using ResultType_t = typename ResultType<Result_t, Value_t>::type;
-
-template<typename Result_t, typename Value_t>
-inline ResultType_t<Result_t, Value_t> value_2_result(Value_t& value)
-{
-    return value;
-}
 
 inline wchar_t widest(char ch)
 {
@@ -86,7 +200,7 @@ inline wchar_t widest(wchar_t ch)
     return ch;
 }
 
-template<typename Result_t, typename String_t, typename Value_t>
+template<typename Result_t, typename Value_t, typename String_t>
 ResultType_t<Result_t, Value_t> get_value(const String_t& jpath, Value_t& value)
 {
     if (jpath.empty())
@@ -99,7 +213,7 @@ ResultType_t<Result_t, Value_t> get_value(const String_t& jpath, Value_t& value)
     }
     if (jpath.length() == 1)
     {
-        return value_2_result<Result_t>(value);
+        return ResultType<Result_t, Value_t>::get_value(value);
     }
     auto current_value = &value;
     enum class estate_t
@@ -144,6 +258,16 @@ const json_spirit::Value& get_value(const std::string& jpath, const json_spirit:
     return get_value<json_spirit::Value>(jpath, value);
 }
 
+const json_spirit::mValue& get_value(const std::string& jpath, const json_spirit::mValue& value)
+{
+    return get_value<json_spirit::mValue>(jpath, value);
+}
+
+json_spirit::mValue& get_value(const std::string& jpath, json_spirit::mValue& value)
+{
+    return get_value<json_spirit::mValue>(jpath, value);
+}
+
 json_spirit::Value& get_value(const std::string& jpath, json_spirit::Value& value)
 {
     return get_value<json_spirit::Value>(jpath, value);
@@ -154,12 +278,90 @@ const json_spirit::wValue& get_value(const std::wstring& jpath, const json_spiri
     return get_value<json_spirit::wValue>(jpath, value);
 }
 
-//const json_spirit::Object& get_obj(const std::string& jpath, const json_spirit::Value& value)
-//{
-//    return get_value<json_spirit::Object>(jpath, value);
-//}
-//
-//json_spirit::Object& get_obj(const std::string& jpath, json_spirit::Value& value)
-//{
-//    return get_value<json_spirit::Object>(jpath, value);
-//}
+const json_spirit::wmValue& get_value(const std::wstring& jpath, const json_spirit::wmValue& value)
+{
+    return get_value<json_spirit::wmValue>(jpath, value);
+}
+
+json_spirit::wmValue& get_value(const std::wstring& jpath, json_spirit::wmValue& value)
+{
+    return get_value<json_spirit::wmValue>(jpath, value);
+}
+
+json_spirit::wValue& get_value(const std::wstring& jpath, json_spirit::wValue& value)
+{
+    return get_value<json_spirit::wValue>(jpath, value);
+}
+
+const json_spirit::Object& get_obj(const std::string& jpath, const json_spirit::Value& value)
+{
+    return get_value<json_spirit::Object>(jpath, value);
+}
+
+json_spirit::Object& get_obj(const std::string& jpath, json_spirit::Value& value)
+{
+    return get_value<json_spirit::Object>(jpath, value);
+}
+
+const json_spirit::wObject& get_obj(const std::wstring& jpath, const json_spirit::wValue& value)
+{
+    return get_value<json_spirit::wObject>(jpath, value);
+}
+
+json_spirit::wObject& get_obj(const std::wstring& jpath, json_spirit::wValue& value)
+{
+    return get_value<json_spirit::wObject>(jpath, value);
+}
+
+const json_spirit::mObject& get_obj(const std::string& jpath, const json_spirit::mValue& value)
+{
+    return get_value<json_spirit::mObject>(jpath, value);
+}
+
+json_spirit::mObject& get_obj(const std::string& jpath, json_spirit::mValue& value)
+{
+    return get_value<json_spirit::mObject>(jpath, value);
+}
+
+const json_spirit::wmObject& get_obj(const std::wstring& jpath, const json_spirit::wmValue& value)
+{
+    return get_value<json_spirit::wmObject>(jpath, value);
+}
+
+json_spirit::wmObject& get_obj(const std::wstring& jpath, json_spirit::wmValue& value)
+{
+    return get_value<json_spirit::wmObject>(jpath, value);
+}
+
+const json_spirit::Array& get_array(const std::string& jpath, const json_spirit::Value& value)
+{
+    return get_value<json_spirit::Array>(jpath, value);
+}
+const json_spirit::mArray& get_array(const std::string& jpath, const json_spirit::mValue& value)
+{
+    return get_value<json_spirit::mArray>(jpath, value);
+}
+const json_spirit::wArray& get_array(const std::wstring& jpath, const json_spirit::wValue& value)
+{
+    return get_value<json_spirit::wArray>(jpath, value);
+}
+const json_spirit::wmArray& get_array(const std::wstring& jpath, const json_spirit::wmValue& value)
+{
+    return get_value<json_spirit::wmArray>(jpath, value);
+}
+json_spirit::Array& get_array(const std::string& jpath, json_spirit::Value& value)
+{
+    return get_value<json_spirit::Array>(jpath, value);
+}
+json_spirit::mArray& get_array(const std::string& jpath, json_spirit::mValue& value)
+{
+    return get_value<json_spirit::mArray>(jpath, value);
+}
+json_spirit::wArray& get_array(const std::wstring& jpath, json_spirit::wValue& value)
+{
+    return get_value<json_spirit::wArray>(jpath, value);
+}
+json_spirit::wmArray& get_array(const std::wstring& jpath, json_spirit::wmValue& value)
+{
+    return get_value<json_spirit::wmArray>(jpath, value);
+}

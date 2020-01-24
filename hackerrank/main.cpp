@@ -7,127 +7,101 @@
 
 using namespace std;
 
-json_spirit::Value make_json(const std::string& s)
+template<typename Result_t>
+Result_t make_json(const std::string& s)
 {
-    json_spirit::Value json;
+    Result_t json;
     json_spirit::read(s, json);
     return json;
 }
 
-json_spirit::wValue make_json(const std::wstring& s)
+template<typename Result_t>
+Result_t make_json(const std::wstring& s)
 {
-    json_spirit::wValue json;
+    Result_t json;
     json_spirit::read(s, json);
     return json;
 }
 
-TEST(ConstJsonSpiritValueTypesCase, ConstJsonSpiritValueTypesTest)
+TEST(JsonSpiritValueCase, JsonSpiritValueTest)
 {
-    //
-    // Value.
-    //
     {
-        auto json = make_json(R"({"Hello" : "field"})");
+        auto json = make_json<json_spirit::Value>(R"({"Hello" : "field"})");
         const auto& cjson = json;
         auto t = cjson.type();
-        const json_spirit::Value& v = get_value("$", cjson);
+        const auto& v = get_value("$", cjson);
         ASSERT_EQ(v.type(), json_spirit::obj_type);
     }
-    //
-    // Object.
-    //
-    //{
-    //    auto json = make_json(R"({"Hello" : "field"})");
-    //    const auto& cjson = json;
-    //    const json_spirit::Object& obj = get_obj("$", cjson);
-    //    ASSERT_EQ(obj.size(), 1);
-    //}
-    ////
-    //// Array.
-    ////
-    //{
-    //    auto json = make_json(R"([1, 2, 3])");
-    //    const auto& cjson = json;
-    //    const json_spirit::Array& arr = get_array("$", cjson);
-    //    ASSERT_EQ(arr.size(), 3);
-    //}
-    ////
-    //// String.
-    ////
-    //{
-    //    auto json = make_json(R"("Hello world!!!")");
-    //    const auto& cjson = json;
-    //    auto s = get_str("$", cjson);
-    //    ASSERT_EQ(s, "Hello world!!!");
-    //}
-    ////
-    //// Integer.
-    ////
-    //{
-    //    auto json = make_json(R"(2)");
-    //    const auto& cjson = json;
-    //    int i = get_int("$", cjson);
-    //    ASSERT_EQ(i, 2);
-    //}
-    ////
-    //// Bool.
-    ////
-    //{
-    //    auto json = make_json(R"(false)");
-    //    const auto& cjson = json;
-    //    bool b = get_bool("$", cjson);
-    //    ASSERT_EQ(b, false);
-    //}
-    ////
-    //// Integer64.
-    ////
-    //{
-    //    auto json = make_json(R"(3423423873487389343)");
-    //    const auto& cjson = json;
-    //    std::int64_t i = get_int64("$", cjson);
-    //    ASSERT_EQ(i, 3423423873487389343LL);
-    //}
-    ////
-    //// Real.
-    ////
-    //{
-    //    auto json = make_json(R"(1.0)");
-    //    const auto& cjson = json;
-    //    double d = get_real("$", cjson);
-    //    ASSERT_EQ(d, 1.0);
-    //}
+    {
+        auto json = make_json<json_spirit::mValue>(R"({"Hello" : "field"})");
+        const auto& cjson = json;
+        auto t = cjson.type();
+        const auto& v = get_value("$", cjson);
+        ASSERT_EQ(v.type(), json_spirit::obj_type);
+    }
+    {
+        auto json = make_json<json_spirit::wValue>(LR"({"Hello" : "field"})");
+        const auto& cjson = json;
+        auto t = cjson.type();
+        const auto& v = get_value(L"$", cjson);
+        ASSERT_EQ(v.type(), json_spirit::obj_type);
+    }
+    {
+        auto json = make_json<json_spirit::Value>(R"({"Hello" : "field"})");
+        auto& v = get_value("$", json);
+        ASSERT_EQ(v.type(), json_spirit::obj_type);
+    }
+    {
+        auto json = make_json<json_spirit::mValue>(R"({"Hello" : "field"})");
+        auto& v = get_value("$", json);
+        ASSERT_EQ(v.type(), json_spirit::obj_type);
+    }
+    {
+        auto json = make_json<json_spirit::wValue>(LR"({"Hello" : "field"})");
+        auto& v = get_value(L"$", json);
+        ASSERT_EQ(v.type(), json_spirit::obj_type);
+    }
+    {
+        auto json = make_json<json_spirit::wmValue>(LR"({"Hello" : "field"})");
+        auto& v = get_value(L"$", json);
+        ASSERT_EQ(v.type(), json_spirit::obj_type);
+    }
 }
 
-TEST(ConstWJsonSpiritValueTypesCase, ConstWJsonSpiritValueTypesTest)
+TEST(JsonSpiritObjectCase, JsonSpiritObjectCase)
 {
-    //
-    // Value.
-    //
     {
-        auto json = make_json(LR"({"Hello" : "field"})");
-        const auto& cjson = json;
-        auto t = cjson.type();
-        const json_spirit::wValue& v = get_value(L"$", cjson);
-        ASSERT_EQ(v.type(), json_spirit::obj_type);
+        auto json = make_json<json_spirit::Value>(R"({"Hello" : "field"})");
+        const auto& cjson   = json;
+        const auto& cobj    = get_obj("$", cjson);
+        auto&       obj     = get_obj("$", json);
+        ASSERT_EQ(cobj.size()   , 1);
+        ASSERT_EQ(obj.size()    , 1);
     }
-    ////
-    //// Object.
-    ////
-    //{
-    //    auto json = make_json(LR"({"Hello" : "field"})");
-    //    const auto& cjson = json;
-    //    const json_spirit::wObject& obj = get_obj(L"$", cjson);
-    //    ASSERT_EQ(obj.size(), 1);
-    //}
-    ////
-    //// Array.
-    ////
-    //{
-    //    auto json = make_json(LR"([1, 2, 3])");
-    //    const auto& cjson = json;
-    //    const json_spirit::wArray& arr = get_array(L"$", cjson);
-    //    ASSERT_EQ(arr.size(), 3);
-    //}
+    {
+        auto json = make_json<json_spirit::mValue>(R"({"Hello" : "field"})");
+        const auto& cjson = json;
+        const auto& cobj = get_obj("$", cjson);
+        auto& obj = get_obj("$", json);
+        ASSERT_EQ(cobj.size(), 1);
+        ASSERT_EQ(obj.size(), 1);
+    }
+    {
+        auto json = make_json<json_spirit::wValue>(LR"({"Hello" : "field"})");
+        const auto& cjson   = json;
+        const auto& cobj    = get_obj(L"$", cjson);
+        auto&       obj     = get_obj(L"$", json);
+        ASSERT_EQ(cobj.size()   , 1);
+        ASSERT_EQ(obj.size()    , 1);
+    }
+    {
+        auto json = make_json<json_spirit::wmValue>(LR"({"Hello" : "field"})");
+        const auto& cjson = json;
+        const auto& cobj = get_obj(L"$", cjson);
+        auto& obj = get_obj(L"$", json);
+        ASSERT_EQ(cobj.size(), 1);
+        ASSERT_EQ(obj.size(), 1);
+    }
     ////
     //// String.
     ////
@@ -175,24 +149,56 @@ TEST(ConstWJsonSpiritValueTypesCase, ConstWJsonSpiritValueTypesTest)
     //}
 }
 
+TEST(JsonSpiritArrayCase, JsonSpiritArrayCase)
+{
+    {
+        auto json = make_json<json_spirit::Value>(R"([1, 2, 3])");
+        const auto& cjson = json;
+        const auto& carr = get_array("$", cjson);
+        auto&       arr = get_array("$", json);
+        ASSERT_EQ(carr.size(), 3);
+        ASSERT_EQ(arr.size(), 3);
+    }
+    {
+        auto json = make_json<json_spirit::mValue>(R"([1, 2, 3])");
+        const auto& cjson = json;
+        const auto& carr = get_array("$", cjson);
+        auto& arr = get_array("$", json);
+        ASSERT_EQ(carr.size(), 3);
+        ASSERT_EQ(arr.size(), 3);
+    }
+    {
+        auto json = make_json<json_spirit::wValue>(LR"([1, 2, 3])");
+        const auto& cjson = json;
+        const auto& carr = get_array(L"$", cjson);
+        auto& arr = get_array(L"$", json);
+        ASSERT_EQ(carr.size(), 3);
+        ASSERT_EQ(arr.size(), 3);
+    }
+    {
+        auto json = make_json<json_spirit::wmValue>(LR"([1, 2, 3])");
+        const auto& cjson = json;
+        const auto& carr = get_array(L"$", cjson);
+        auto& arr = get_array(L"$", json);
+        ASSERT_EQ(carr.size(), 3);
+        ASSERT_EQ(arr.size(), 3);
+    }
+}
+
 TEST(JsonSpiritValueTypesCase, JsonSpiritValueTypesTest)
 {
     //
     // Value.
     //
-    {
+    
+    //
+    // Object.
+    //
+    /*{
         json_spirit::Value json = make_json(R"({"Hello" : "field"})");
-        json_spirit::Value& v = get_value("$", json);
-        ASSERT_EQ(v.type(), json_spirit::obj_type);
-    }
-    ////
-    //// Object.
-    ////
-    //{
-    //    json_spirit::Value json = make_json(R"({"Hello" : "field"})");
-    //    const json_spirit::Object& obj = get_obj("$", json);
-    //    ASSERT_EQ(obj.size(), 1);
-    //}
+        const json_spirit::Object& obj = get_obj("$", json);
+        ASSERT_EQ(obj.size(), 1);
+    }*/
     ////
     //// Array.
     ////
