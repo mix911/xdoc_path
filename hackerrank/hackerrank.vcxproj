@@ -156,6 +156,7 @@
   <ItemGroup>
     <ClCompile Include="json_utils.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="test_interface.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="json_utils.h" />

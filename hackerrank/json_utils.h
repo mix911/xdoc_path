@@ -4,6 +4,16 @@
 #include <string>
 #include <stddef.h>
 
+std::vector<const json_spirit::Value*>   request_by_jpath(const std::string&  jpath, const json_spirit::Value&   value);
+std::vector<const json_spirit::mValue*>  request_by_jpath(const std::string&  jpath, const json_spirit::mValue&  value);
+std::vector<const json_spirit::wValue*>  request_by_jpath(const std::wstring& jpath, const json_spirit::wValue&  value);
+std::vector<const json_spirit::wmValue*> request_by_jpath(const std::wstring& jpath, const json_spirit::wmValue& value);
+std::vector<json_spirit::Value*>   request_by_jpath(const std::string& jpath,  json_spirit::Value& value);
+std::vector<json_spirit::mValue*>  request_by_jpath(const std::string& jpath,  json_spirit::mValue& value);
+std::vector<json_spirit::wValue*>  request_by_jpath(const std::wstring& jpath, json_spirit::wValue& value);
+std::vector<json_spirit::wmValue*> request_by_jpath(const std::wstring& jpath, json_spirit::wmValue& value);
+
+
 const json_spirit::Value&   get_value(const std::string&  jpath, const json_spirit::Value&   value);
 const json_spirit::mValue&  get_value(const std::string&  jpath, const json_spirit::mValue&  value);
 const json_spirit::wValue&  get_value(const std::wstring& jpath, const json_spirit::wValue&  value);
@@ -38,11 +48,6 @@ const std::string&  get_str(const std::string&  jpath, const json_spirit::Value&
 const std::string&  get_str(const std::string&  jpath, const json_spirit::mValue&  value);
 const std::wstring& get_str(const std::wstring& jpath, const json_spirit::wValue&  value);
 const std::wstring& get_str(const std::wstring& jpath, const json_spirit::wmValue& value);
-
-std::string&  get_str(const std::string&  jpath, json_spirit::Value&   value);
-std::string&  get_str(const std::string&  jpath, json_spirit::mValue&  value);
-std::wstring& get_str(const std::wstring& jpath, json_spirit::wValue&  value);
-std::wstring& get_str(const std::wstring& jpath, json_spirit::wmValue& value);
 
 bool get_bool(const std::string&  jpath, const json_spirit::Value&   value);
 bool get_bool(const std::string&  jpath, const json_spirit::mValue&  value);
