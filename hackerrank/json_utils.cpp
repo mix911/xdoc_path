@@ -2,6 +2,7 @@
 
 #include <algorithm>
 #include <type_traits>
+#include <stack>
 
 const json_spirit::Value& get_field(const std::string& jpath, const std::string& fieldName, const json_spirit::Object& obj)
 {
@@ -15,7 +16,6 @@ const json_spirit::Value& get_field(const std::string& jpath, const std::string&
     }
     return it->value_;
 }
-
 json_spirit::Value& get_field(const std::string& jpath, const std::string& fieldName, json_spirit::Object& obj)
 {
     auto it = std::find_if(obj.begin(), obj.end(), [&fieldName](const json_spirit::Pair& p)
@@ -28,7 +28,6 @@ json_spirit::Value& get_field(const std::string& jpath, const std::string& field
     }
     return it->value_;
 }
-
 const json_spirit::mValue& get_field(const std::string& jpath, const std::string& fieldName, const json_spirit::mObject& obj)
 {
     auto it = obj.find(fieldName);
@@ -38,7 +37,6 @@ const json_spirit::mValue& get_field(const std::string& jpath, const std::string
     }
     return it->second;
 }
-
 json_spirit::mValue& get_field(const std::string& jpath, const std::string& fieldName, json_spirit::mObject& obj)
 {
     auto it = obj.find(fieldName);
@@ -48,7 +46,6 @@ json_spirit::mValue& get_field(const std::string& jpath, const std::string& fiel
     }
     return it->second;
 }
-
 const json_spirit::wValue& get_field(const std::wstring& jpath, const std::wstring& fieldName, const json_spirit::wObject& obj)
 {
     auto it = std::find_if(obj.begin(), obj.end(), [&fieldName](const json_spirit::wPair& p)
@@ -61,7 +58,6 @@ const json_spirit::wValue& get_field(const std::wstring& jpath, const std::wstri
     }
     return it->value_;
 }
-
 json_spirit::wValue& get_field(const std::wstring& jpath, const std::wstring& fieldName, json_spirit::wObject& obj)
 {
     auto it = std::find_if(obj.begin(), obj.end(), [&fieldName](const json_spirit::wPair& p)
@@ -74,7 +70,6 @@ json_spirit::wValue& get_field(const std::wstring& jpath, const std::wstring& fi
     }
     return it->value_;
 }
-
 const json_spirit::wmValue& get_field(const std::wstring& jpath, const std::wstring& fieldName, const json_spirit::wmObject& obj)
 {
     auto it = obj.find(fieldName);
@@ -84,7 +79,6 @@ const json_spirit::wmValue& get_field(const std::wstring& jpath, const std::wstr
     }
     return it->second;
 }
-
 json_spirit::wmValue& get_field(const std::wstring& jpath, const std::wstring& fieldName, json_spirit::wmObject& obj)
 {
     auto it = obj.find(fieldName);
@@ -93,6 +87,52 @@ json_spirit::wmValue& get_field(const std::wstring& jpath, const std::wstring& f
         throw L"Can't find field by '" + jpath, L"'";
     }
     return it->second;
+}
+
+inline json_spirit::Object::iterator find_field(const std::string& n, json_spirit::Object& o)
+{
+    return std::find_if(o.begin(), o.end(), [&n](const json_spirit::Pair& p)
+    {
+        return p.name_ == n;
+    });
+}
+inline json_spirit::Object::const_iterator find_field(const std::string& n, const json_spirit::Object& o)
+{
+    return std::find_if(o.begin(), o.end(), [&n](const json_spirit::Pair& p)
+    {
+        return p.name_ == n;
+    });
+}
+inline json_spirit::mObject::iterator find_field(const std::string& n, json_spirit::mObject& o)
+{
+    return o.find(n);
+}
+inline json_spirit::mObject::const_iterator find_field(const std::string& n, const json_spirit::mObject& o)
+{
+    return o.find(n);
+}
+
+inline json_spirit::wObject::iterator find_field(const std::wstring& n, json_spirit::wObject& o)
+{
+    return std::find_if(o.begin(), o.end(), [&n](const json_spirit::wPair& p)
+    {
+        return p.name_ == n;
+    });
+}
+inline json_spirit::wObject::const_iterator find_field(const std::wstring& n, const json_spirit::wObject& o)
+{
+    return std::find_if(o.begin(), o.end(), [&n](const json_spirit::wPair& p)
+    {
+        return p.name_ == n;
+    });
+}
+inline json_spirit::wmObject::iterator find_field(const std::wstring& n, json_spirit::wmObject& o)
+{
+    return o.find(n);
+}
+inline json_spirit::wmObject::const_iterator find_field(const std::wstring& n, const json_spirit::wmObject& o)
+{
+    return o.find(n);
 }
 
 template<typename Result_t, typename Value_t>
@@ -104,7 +144,6 @@ struct ResultType
         return v;
     }
 };
-
 template<typename Value_t>
 struct ResultType<json_spirit::Object, Value_t>
 {
@@ -114,7 +153,6 @@ struct ResultType<json_spirit::Object, Value_t>
         return v.get_obj();
     }
 };
-
 template<typename Value_t>
 struct ResultType<json_spirit::wObject, Value_t>
 {
@@ -124,7 +162,6 @@ struct ResultType<json_spirit::wObject, Value_t>
         return v.get_obj();
     }
 };
-
 template<typename Value_t>
 struct ResultType<json_spirit::mObject, Value_t>
 {
@@ -134,7 +171,6 @@ struct ResultType<json_spirit::mObject, Value_t>
         return v.get_obj();
     }
 };
-
 template<typename Value_t>
 struct ResultType<json_spirit::wmObject, Value_t>
 {
@@ -144,7 +180,6 @@ struct ResultType<json_spirit::wmObject, Value_t>
         return v.get_obj();
     }
 };
-
 template<typename Value_t>
 struct ResultType<json_spirit::Array, Value_t>
 {
@@ -154,7 +189,6 @@ struct ResultType<json_spirit::Array, Value_t>
         return v.get_array();
     }
 };
-
 template<typename Value_t>
 struct ResultType<json_spirit::wArray, Value_t>
 {
@@ -164,7 +198,6 @@ struct ResultType<json_spirit::wArray, Value_t>
         return v.get_array();
     }
 };
-
 template<typename Value_t>
 struct ResultType<json_spirit::mArray, Value_t>
 {
@@ -174,7 +207,6 @@ struct ResultType<json_spirit::mArray, Value_t>
         return v.get_array();
     }
 };
-
 template<typename Value_t>
 struct ResultType<json_spirit::wmArray, Value_t>
 {
@@ -184,7 +216,6 @@ struct ResultType<json_spirit::wmArray, Value_t>
         return v.get_array();
     }
 };
-
 template<typename Value_t>
 struct ResultType<std::string, Value_t>
 {
@@ -194,7 +225,6 @@ struct ResultType<std::string, Value_t>
         return v.get_str();
     }
 };
-
 template<typename Value_t>
 struct ResultType<std::wstring, Value_t>
 {
@@ -204,7 +234,6 @@ struct ResultType<std::wstring, Value_t>
         return v.get_str();
     }
 };
-
 template<typename Value_t>
 struct ResultType<bool, Value_t>
 {
@@ -214,7 +243,6 @@ struct ResultType<bool, Value_t>
         return v.get_bool();
     }
 };
-
 template<typename Value_t>
 struct ResultType<int, Value_t>
 {
@@ -224,7 +252,6 @@ struct ResultType<int, Value_t>
         return v.get_int();
     }
 };
-
 template<typename Value_t>
 struct ResultType<std::int64_t, Value_t>
 {
@@ -234,7 +261,6 @@ struct ResultType<std::int64_t, Value_t>
         return v.get_int64();
     }
 };
-
 template<typename Value_t>
 struct ResultType<std::uint64_t, Value_t>
 {
@@ -244,7 +270,6 @@ struct ResultType<std::uint64_t, Value_t>
         return v.get_uint64();
     }
 };
-
 template<typename Value_t>
 struct ResultType<double, Value_t>
 {
@@ -254,7 +279,6 @@ struct ResultType<double, Value_t>
         return v.get_real();
     }
 };
-
 template<typename Result_t, typename Value_t>
 using ResultType_t = typename ResultType<Result_t, Value_t>::type;
 
@@ -262,132 +286,9 @@ inline wchar_t widest(char ch)
 {
     return static_cast<wchar_t>(ch);
 }
-
 inline wchar_t widest(wchar_t ch)
 {
     return ch;
-}
-
-template<typename String_t, typename Value_t>
-void request_by_jpath_impl(size_t beginIndex,
-                           const String_t& jpath,
-                           Value_t& value,
-                           std::vector<Value_t*>& values)
-{
-    //
-    // Types.
-    //
-    using tchar_t = typename String_t::value_type;
-    //
-    // Exit point.
-    //
-    if (beginIndex >= jpath.size())
-    {
-        values.push_back(&value);
-        return;
-    }
-    //
-    //
-    //
-    switch (widest(jpath[0]))
-    {
-        case '$':
-            throw std::exception("Not implemented.");
-        case '.':
-            if (jpath.size() < 2)
-            {
-                return;
-            }
-            throw std::exception("Not implemented.");
-        default:
-            break;
-    }
-
-    //
-    // Checking arguments.
-    //
-    if (jpath.empty())
-    {
-        throw std::exception("Empty jpath.");
-    }
-    if (jpath[0] != widest('$'))
-    {
-        throw std::exception("JPath must start with '$' symbol.");
-    }
-    if (jpath.length() == 1)
-    {
-        //return { value };
-    }
-    auto current_value = &value;
-    //
-    // List of states.
-    //
-    enum class estate_t
-    {
-        dot_or_sq_of_root,
-        reading_field_name_or_dot_of_root,
-        reading_field_name_of_root,
-        recursive_descent_of_root,
-    } state = estate_t::dot_or_sq_of_root;
-    //
-    // For each symbol in jpath except first one.
-    //
-    String_t field_name;
-    for (size_t i = 1; i < jpath.size(); ++i)
-    {
-        wchar_t ch = widest(jpath[i]);
-        switch (state)
-        {
-            case estate_t::dot_or_sq_of_root:
-                switch (ch)
-                {
-                    case L'.':
-                    {
-                        if (current_value->type() != json_spirit::obj_type)
-                        {
-                            throw std::exception(("Subpath [0.." + std::to_string(i) + ") isn't an object.").c_str());
-                        }
-                        state = estate_t::reading_field_name_or_dot_of_root;
-                        break;
-                    }
-                    case L'[':
-                        throw std::exception("Not implemented.");
-                    case L'*':
-                        throw std::exception("Not implemented.");
-                    default:
-                        throw std::exception("Second symbol of jpath has to be '.' or '['.");
-                }
-                break;
-            case estate_t::reading_field_name_or_dot_of_root:
-                switch (ch)
-                {
-                    case L'.':
-                        state = estate_t::recursive_descent_of_root;
-                        break;
-                    default:
-                        field_name += static_cast<tchar_t>(ch);
-                        state = estate_t::reading_field_name_of_root;
-                        break;
-                }
-                break;
-            case estate_t::recursive_descent_of_root:
-                throw std::exception("Not implemented.");
-            case estate_t::reading_field_name_of_root:
-                switch (ch)
-                {
-                    case L'.':
-                        throw std::exception("Not implemented.");
-                    case L'[':
-                        throw std::exception("Not implemented.");
-                    default:
-                        throw std::exception("Not implemented.");
-                }
-                break;
-            default:
-                throw std::exception("Not implemented.");
-        }
-    }
-    throw "Not implemented.";
 }
 
 inline auto& get_second(json_spirit::Pair& p)
@@ -406,7 +307,6 @@ inline const auto& get_second(const json_spirit::wPair& p)
 {
     return p.value_;
 }
-
 inline auto& get_second(json_spirit::mObject::value_type& p)
 {
     return p.second;
@@ -424,40 +324,354 @@ inline const auto& get_second(const json_spirit::wmObject::value_type& p)
     return p.second;
 }
 
-template<typename String_t, typename Value_t>
-std::vector<Value_t*> request_by_jpath(const String_t& jpath, Value_t& value)
+template<typename Result_t>
+Result_t t2s(const std::wstring& ws)
 {
-    std::vector<Value_t*> result_values;
-    if (jpath.empty())
+    Result_t s;
+    std::transform(ws.begin(), ws.end(), std::back_inserter(s), [](wchar_t wch)
     {
-        return { };
+        return static_cast<typename Result_t::value_type>(wch);
+    });
+    return s;
+}
+
+//template<typename Iterator_t, typename Value_t>
+//void request_by_jpath_impl(Iterator_t beg,
+//                           Iterator_t end,
+//                           Value_t& value,
+//                           std::vector<Value_t*>& values)
+//{
+//    using string_type = typename Value_t::String_type;
+//    using char_t      = typename string_type::value_type;
+//    if (beg == end)
+//    {
+//        values.push_back(&value);
+//        return;
+//    }
+//    switch (widest(*beg))
+//    {
+//        //
+//        // Parsing field by dot.
+//        //
+//        case L'.':
+//        {
+//            ++beg;
+//            if (beg == end)
+//            {
+//                values.push_back(&value);
+//                return;
+//            }
+//            if (*beg == static_cast<char_t>('.'))
+//            {
+//                throw std::exception("Recursive descent not implemented.");
+//            }
+//            if (value.type() != json_spirit::obj_type)
+//            {
+//                return;
+//            }
+//            auto it = std::find_if(beg, end, [](typename Value_t::String_type::value_type ch)
+//            {
+//                return widest(ch) == L'.' || widest(ch) == L'[';
+//            });
+//            string_type current_name(beg, it);
+//
+//            return;
+//        }
+//
+//    }
+//
+//    auto it = std::find_if(beg, end, [](typename Value_t::String_type::value_type ch)
+//    {
+//        return widest(ch) == L'.' || widest(ch) == L'[';
+//    });
+//    //
+//    // Creating string.
+//    //
+//    string_type current_name(beg, it);
+//    if (current_name == string_type(1, static_cast<char_t>('$')))
+//    {
+//        return request_by_jpath_impl(it, end, value, values);
+//    }
+//    else if (current_name == string_type(1, static_cast<char_t>('*')))
+//    {
+//        switch (value.type())
+//        {
+//            case json_spirit::array_type:
+//                for (auto& v : value.get_array())
+//                {
+//                    request_by_jpath_impl(it + 1, end, v, values);
+//                }
+//                return;
+//            case json_spirit::obj_type:
+//                for (auto& p : value.get_obj())
+//                {
+//                    auto& v = get_second(p);
+//                    request_by_jpath_impl(it, end, v, values);
+//                }
+//                return;
+//            default:
+//                throw std::exception("Not implemented.");
+//        }
+//    }
+//    
+//    throw std::exception("Not implemented.");
+//
+//    switch (widest(*it))
+//    {
+//        case L'.':
+//            
+//            break;
+//        case L'[':
+//            break;
+//        default:
+//            break;
+//    }
+//    /*switch (widest(jpath[beginIndex]))
+//    {
+//        case L'$':
+//            request_by_jpath_impl(1, jpath, value, result_values);
+//            break;
+//        case L'*':
+//            switch (value.type())
+//            {
+//                case json_spirit::obj_type:
+//                    for (auto& p : value.get_obj())
+//                    {
+//                        auto& s = get_second(p);
+//                        request_by_jpath_impl(1, jpath, s, result_values);
+//                        break;
+//                case json_spirit::array_type:
+//                    for (auto& v : value.get_array())
+//                    {
+//                        request_by_jpath_impl(1, jpath, v, result_values);
+//                    }
+//                    break;
+//                default:
+//                    break;
+//                    }
+//                    break;
+//            }
+//    }*/
+//}
+
+enum class estate_t
+{
+    root,
+    dot_or_sq,
+    dot_or_field,
+    second_dot,
+};
+
+template<typename Iterator_t, typename Value_t>
+struct state_t
+{
+    state_t(Iterator_t beg,
+            Iterator_t end,
+            Value_t* value,
+            estate_t state)
+        : beg(beg)
+        , end(end)
+        , value(value)
+        , state(state)
+    {
     }
-    switch (widest(jpath[0]))
+    Iterator_t beg;
+    Iterator_t end;
+    Value_t* value;
+    estate_t   state;
+};
+
+template<typename Iterator_t, typename Value_t>
+void request_by_jpath_impl(estate_t state,
+                           Iterator_t beg,
+                           Iterator_t end,
+                           Value_t& value,
+                           std::vector<Value_t*>& values)
+{
+    //
+    // Types.
+    //
+    using string_t = typename Value_t::String_type;
+    using char_t   = typename string_t::value_type;
+    //
+    // Exit point.
+    //
+    if (beg == end)
     {
-        case L'$':
-            request_by_jpath_impl(1, jpath, value, result_values);
-            break;
-        case L'*':
-            switch (value.type())
+        values.push_back(&value);
+        return;
+    }
+    //
+    // Finite automata.
+    //
+    switch (state)
+    {
+        case estate_t::root:
+        {
+            switch (widest(*beg))
             {
-                case json_spirit::obj_type:
-                    for (auto& p : value.get_obj())
+                //
+                // Star as root.
+                //
+                case L'*':
+                {
+                    switch (value.type())
                     {
-                        auto& s = get_second(p);
-                        request_by_jpath_impl(1, jpath, s, result_values);
+                        case json_spirit::obj_type:
+                        {
+                            for (auto& p : value.get_obj())
+                            {
+                                request_by_jpath_impl(estate_t::dot_or_sq,
+                                                      beg + 1,
+                                                      end,
+                                                      get_second(p),
+                                                      values);
+                            }
+                            break;
+                        }
+                        case json_spirit::array_type:
+                        {
+                            for (auto& v : value.get_array())
+                            {
+                                request_by_jpath_impl(estate_t::dot_or_sq,
+                                                      beg + 1,
+                                                      end,
+                                                      v,
+                                                      values);
+                            }
+                            break;
+                        }
+                        default:
+                            break;
                     }
                     break;
-                case json_spirit::array_type:
-                    for (auto& v : value.get_array())
+                }
+                //
+                // Dollar as rood.
+                //
+                case L'$':
+                {
+                    request_by_jpath_impl(estate_t::dot_or_sq,
+                                          beg + 1,
+                                          end,
+                                          value,
+                                          values);
+                    break;
+                }
+            }
+            break;
+        }
+        case estate_t::dot_or_sq:
+        {
+            
+            switch (widest(*beg))
+            {
+                case L'.':
+                {
+                    ++beg;
+                    //
+                    // Nothing after dot.
+                    //
+                    if (beg == end)
                     {
-                        request_by_jpath_impl(1, jpath, v, result_values);
+                        request_by_jpath_impl(estate_t::dot_or_field,
+                                              beg,
+                                              end,
+                                              value,
+                                              values);
+                        break;
+                    }
+                    //
+                    // There is some symbol after dot, let's analize it.
+                    //
+                    switch (widest(*beg))
+                    {
+                        //
+                        // It's second dot.
+                        //
+                        case L'.':
+                        {
+                            request_by_jpath_impl(estate_t::second_dot,
+                                                  beg + 1,
+                                                  end,
+                                                  value,
+                                                  values);
+                            break;
+                        }
+                        case L'[':
+                        {
+                            break;
+                        }
+                        case L'*':
+                        {
+                            break;
+                        }
+                        case L'$':
+                        {
+                            break;
+                        }
+                        default:
+                        {
+                            //
+                            // It works only for objects.
+                            //
+                            if (value.type() != json_spirit::obj_type)
+                            {
+                                break;
+                            }
+                            //
+                            // Creating field name.
+                            //
+                            auto it = std::find_if(beg, end, [](char_t ch)
+                            {
+                                return ch == static_cast<char_t>('.') || ch == static_cast<char_t>('[');
+                            });
+                            string_t name(beg, it);
+                            //
+                            // Looking for field by name.
+                            //
+                            auto obj_it = find_field(name, value.get_obj());
+                            if (obj_it == value.get_obj().end())
+                            {
+                                break;
+                            }
+                            //
+                            // Requesting for found by name value.
+                            //
+                            request_by_jpath_impl(estate_t::dot_or_sq,
+                                                  it,
+                                                  end,
+                                                  get_second(*obj_it),
+                                                  values);
+                            break;
+                        }
                     }
                     break;
+                }
+                case L'[':
+                {
+                    break;
+                }
                 default:
                     break;
             }
             break;
+        }
+        default:
+            break;
     }
+}
+
+
+template<typename String_t, typename Value_t>
+std::vector<Value_t*> request_by_jpath(const String_t& jpath, Value_t& value)
+{
+    if (jpath.empty())
+    {
+        return { };
+    }
+    std::vector<Value_t*> result_values;
+    request_by_jpath_impl(estate_t::root, jpath.begin(), jpath.end(), value, result_values);
     return result_values;
 }
 
