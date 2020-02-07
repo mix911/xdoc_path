@@ -4,91 +4,6 @@
 #include <type_traits>
 #include <stack>
 
-const json_spirit::Value& get_field(const std::string& jpath, const std::string& fieldName, const json_spirit::Object& obj)
-{
-    auto it = std::find_if(obj.begin(), obj.end(), [&fieldName](const json_spirit::Pair& p)
-    {
-        return p.name_ == fieldName;
-    });
-    if (it == obj.end())
-    {
-        throw "Can't find field by '" + jpath, "'";
-    }
-    return it->value_;
-}
-json_spirit::Value& get_field(const std::string& jpath, const std::string& fieldName, json_spirit::Object& obj)
-{
-    auto it = std::find_if(obj.begin(), obj.end(), [&fieldName](const json_spirit::Pair& p)
-    {
-        return p.name_ == fieldName;
-    });
-    if (it == obj.end())
-    {
-        throw "Can't find field by '" + jpath, "'";
-    }
-    return it->value_;
-}
-const json_spirit::mValue& get_field(const std::string& jpath, const std::string& fieldName, const json_spirit::mObject& obj)
-{
-    auto it = obj.find(fieldName);
-    if (it == obj.end())
-    {
-        throw "Can't find field by '" + jpath, "'";
-    }
-    return it->second;
-}
-json_spirit::mValue& get_field(const std::string& jpath, const std::string& fieldName, json_spirit::mObject& obj)
-{
-    auto it = obj.find(fieldName);
-    if (it == obj.end())
-    {
-        throw "Can't find field by '" + jpath, "'";
-    }
-    return it->second;
-}
-const json_spirit::wValue& get_field(const std::wstring& jpath, const std::wstring& fieldName, const json_spirit::wObject& obj)
-{
-    auto it = std::find_if(obj.begin(), obj.end(), [&fieldName](const json_spirit::wPair& p)
-    {
-        return p.name_ == fieldName;
-    });
-    if (it == obj.end())
-    {
-        throw L"Can't find field by '" + jpath, L"'";
-    }
-    return it->value_;
-}
-json_spirit::wValue& get_field(const std::wstring& jpath, const std::wstring& fieldName, json_spirit::wObject& obj)
-{
-    auto it = std::find_if(obj.begin(), obj.end(), [&fieldName](const json_spirit::wPair& p)
-    {
-        return p.name_ == fieldName;
-    });
-    if (it == obj.end())
-    {
-        throw L"Can't find field by '" + jpath, L"'";
-    }
-    return it->value_;
-}
-const json_spirit::wmValue& get_field(const std::wstring& jpath, const std::wstring& fieldName, const json_spirit::wmObject& obj)
-{
-    auto it = obj.find(fieldName);
-    if (it == obj.end())
-    {
-        throw L"Can't find field by '" + jpath, L"'";
-    }
-    return it->second;
-}
-json_spirit::wmValue& get_field(const std::wstring& jpath, const std::wstring& fieldName, json_spirit::wmObject& obj)
-{
-    auto it = obj.find(fieldName);
-    if (it == obj.end())
-    {
-        throw L"Can't find field by '" + jpath, L"'";
-    }
-    return it->second;
-}
-
 inline json_spirit::Object::iterator find_field(const std::string& n, json_spirit::Object& o)
 {
     return std::find_if(o.begin(), o.end(), [&n](const json_spirit::Pair& p)
@@ -562,9 +477,79 @@ void request_by_jpath_impl(estate_t state,
                     }
                     if (*beg == static_cast<char_t>('"'))
                     {
+                        ++beg;
                         //
-                        // TODO: need to implement string as an index.
+                        // We are dealing here only with objects.
                         //
+                        if (value.type() != json_spirit::obj_type)
+                        {
+                            break;
+                        }
+                        //
+                        // Looking for closing '"' symbol.
+                        //
+                        char_t previous_ch = static_cast<char_t>('\0');
+                        auto it = std::find_if(beg, end, [&previous_ch](char_t ch)
+                        {
+                            switch (widest(ch))
+                            {
+                                case L'"':
+                                    switch (widest(previous_ch))
+                                    {
+                                        case L'\\':
+                                            previous_ch = '\0';
+                                            return false;
+                                        default:
+                                            return true;
+                                    }
+                                    break;
+                                case L'\\':
+                                    switch (widest(previous_ch))
+                                    {
+                                        case L'\\':
+                                            previous_ch = '\0';
+                                            return false;
+                                        default:
+                                            previous_ch = '\\';
+                                            return false;
+                                    }
+                                    break;
+                                default:
+                                    return false;
+                            }
+                        });
+                        //
+                        // If '"' wasn't found or if it goes right after opening one, like this "".
+                        //
+                        if (it == beg || it == end || *it != static_cast<char_t>('"'))
+                        {
+                            break;
+                        }
+                        //
+                        // We'v got field name.
+                        //
+                        string_t name(beg, it);
+                        //
+                        // Let's check if we have closing square bracket.
+                        //
+                        if (++it == end || *it != static_cast<char_t>(']'))
+                        {
+                            break;
+                        }
+                        //
+                        // Looking for child value.
+                        //
+                        auto& obj = value.get_obj();
+                        auto child_it = find_field(name, obj);
+                        if (child_it == obj.end())
+                        {
+                            break;
+                        }
+                        request_by_jpath_impl(estate_t::dot_or_sq,
+                                              it + 1,
+                                              end,
+                                              get_second(*child_it),
+                                              values);
                         break;
                     }
                     //

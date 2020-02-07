@@ -44,7 +44,10 @@ TYPED_TEST(RequestByJPathOneInOneLevelObjectTest, Types)
     "field3" : [1, [ { "inside_two_arrays" : "you_ll_find_me" } ], 3],
     "field4" : false,
     "field5" : {
-        "field6" : "field6_field"
+        "field6" : "field6_field",
+        "\"complicataed\"\\\\__\"name" : [{
+            "field" : true
+        }]
     }
 })";
     {
@@ -87,11 +90,23 @@ TYPED_TEST(RequestByJPathOneInOneLevelObjectTest, Types)
         ASSERT_EQ(v.back()->type(), json_spirit::str_type);
         ASSERT_EQ(v.back()->get_str(), t2s<TypeParam::String_type>(L"field6_field"));
         v = request_by_jpath(t2s<TypeParam::String_type>(L"$.field3[2]"), cjson);
+        ASSERT_EQ(v.size(), 1);
         ASSERT_EQ(v.back()->type(), json_spirit::int_type);
         ASSERT_EQ(v.back()->get_int(), 3);
         v = request_by_jpath(t2s<TypeParam::String_type>(L"$.field3[1][0].inside_two_arrays"), cjson);
+        ASSERT_EQ(v.size(), 1);
         ASSERT_EQ(v.back()->type(), json_spirit::str_type);
         ASSERT_EQ(v.back()->get_str(), t2s<TypeParam::String_type>(L"you_ll_find_me"));
+        v = request_by_jpath(t2s<TypeParam::String_type>(L"$[\"field3\"][1][0][\"inside_two_arrays\"]"), cjson);
+        ASSERT_EQ(v.size(), 1);
+        ASSERT_EQ(v.back()->type(), json_spirit::str_type);
+        ASSERT_EQ(v.back()->get_str(), t2s<TypeParam::String_type>(L"you_ll_find_me"));
+       /* v = request_by_jpath(
+            t2s<TypeParam::String_type>(LR"($["field5"][""complicataed"\\__"name"][0].field)"), 
+            cjson);
+        ASSERT_EQ(v.size(), 1);
+        ASSERT_EQ(v.back()->type(), json_spirit::bool_type);
+        ASSERT_EQ(v.back()->get_bool(), true);*/
     }
 }
 
