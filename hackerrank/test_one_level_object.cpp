@@ -34,14 +34,14 @@ template<typename T>
 class RequestByJPathOneInOneLevelObjectTest : public ::testing::Test
 {
 };
-TYPED_TEST_SUITE(RequestByJPathOneInOneLevelObjectTest, Types);
+TYPED_TEST_CASE(RequestByJPathOneInOneLevelObjectTest, Types);
 TYPED_TEST(RequestByJPathOneInOneLevelObjectTest, Types)
 {
     static const wchar_t* sc_json = LR"(
 { 
     "field1" : 1,
     "field2" : "2",
-    "field3" : [1, 2, 3],
+    "field3" : [1, [ { "inside_two_arrays" : "you_ll_find_me" } ], 3],
     "field4" : false,
     "field5" : {
         "field6" : "field6_field"
@@ -78,6 +78,20 @@ TYPED_TEST(RequestByJPathOneInOneLevelObjectTest, Types)
         ASSERT_EQ(v.size(), 1);
         ASSERT_EQ(v.back()->type(), json_spirit::str_type);
         ASSERT_EQ(v.back()->get_str(), t2s<TypeParam::String_type>(L"field6_field"));
+        v = request_by_jpath(t2s<TypeParam::String_type>(L"$.field5.field6."), cjson);
+        ASSERT_EQ(v.size(), 1);
+        ASSERT_EQ(v.back()->type(), json_spirit::str_type);
+        ASSERT_EQ(v.back()->get_str(), t2s<TypeParam::String_type>(L"field6_field"));
+        v = request_by_jpath(t2s<TypeParam::String_type>(L"$.$.$.$.field5.field6."), cjson);
+        ASSERT_EQ(v.size(), 1);
+        ASSERT_EQ(v.back()->type(), json_spirit::str_type);
+        ASSERT_EQ(v.back()->get_str(), t2s<TypeParam::String_type>(L"field6_field"));
+        v = request_by_jpath(t2s<TypeParam::String_type>(L"$.field3[2]"), cjson);
+        ASSERT_EQ(v.back()->type(), json_spirit::int_type);
+        ASSERT_EQ(v.back()->get_int(), 3);
+        v = request_by_jpath(t2s<TypeParam::String_type>(L"$.field3[1][0].inside_two_arrays"), cjson);
+        ASSERT_EQ(v.back()->type(), json_spirit::str_type);
+        ASSERT_EQ(v.back()->get_str(), t2s<TypeParam::String_type>(L"you_ll_find_me"));
     }
 }
 
@@ -85,7 +99,7 @@ template<typename T>
 class RequestByJPathAllInOneLevelObjectTest : public ::testing::Test
 {
 };
-TYPED_TEST_SUITE(RequestByJPathAllInOneLevelObjectTest, Types);
+TYPED_TEST_CASE(RequestByJPathAllInOneLevelObjectTest, Types);
 TYPED_TEST(RequestByJPathAllInOneLevelObjectTest, Types)
 {
     static const wchar_t* sc_json = LR"(
@@ -107,5 +121,3 @@ TYPED_TEST(RequestByJPathAllInOneLevelObjectTest, Types)
     ASSERT_EQ(v[3]->type(), json_spirit::bool_type  );  ASSERT_EQ(v[3]->get_bool()          , false                             );
     ASSERT_EQ(v[4]->type(), json_spirit::obj_type   );  ASSERT_EQ(v[4]->get_obj().size()    , 0                                 );
 }
-
-#undef STR_JSON
