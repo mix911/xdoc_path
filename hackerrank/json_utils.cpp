@@ -485,11 +485,12 @@ void request_by_jpath_impl(estate_t state,
                         {
                             break;
                         }
+                        string_t name;
                         //
                         // Looking for closing '"' symbol.
                         //
                         char_t previous_ch = static_cast<char_t>('\0');
-                        auto it = std::find_if(beg, end, [&previous_ch](char_t ch)
+                        auto it = std::find_if(beg, end, [&previous_ch, &name](char_t ch)
                         {
                             switch (widest(ch))
                             {
@@ -498,6 +499,7 @@ void request_by_jpath_impl(estate_t state,
                                     {
                                         case L'\\':
                                             previous_ch = '\0';
+                                            name.push_back(ch);
                                             return false;
                                         default:
                                             return true;
@@ -508,6 +510,7 @@ void request_by_jpath_impl(estate_t state,
                                     {
                                         case L'\\':
                                             previous_ch = '\0';
+                                            name.push_back(ch);
                                             return false;
                                         default:
                                             previous_ch = '\\';
@@ -515,6 +518,7 @@ void request_by_jpath_impl(estate_t state,
                                     }
                                     break;
                                 default:
+                                    name.push_back(ch);
                                     return false;
                             }
                         });
@@ -525,10 +529,6 @@ void request_by_jpath_impl(estate_t state,
                         {
                             break;
                         }
-                        //
-                        // We'v got field name.
-                        //
-                        string_t name(beg, it);
                         //
                         // Let's check if we have closing square bracket.
                         //

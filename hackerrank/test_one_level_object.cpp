@@ -101,12 +101,12 @@ TYPED_TEST(RequestByJPathOneInOneLevelObjectTest, Types)
         ASSERT_EQ(v.size(), 1);
         ASSERT_EQ(v.back()->type(), json_spirit::str_type);
         ASSERT_EQ(v.back()->get_str(), t2s<TypeParam::String_type>(L"you_ll_find_me"));
-       /* v = request_by_jpath(
-            t2s<TypeParam::String_type>(LR"($["field5"][""complicataed"\\__"name"][0].field)"), 
+        v = request_by_jpath(
+            t2s<TypeParam::String_type>(LR"($["field5"]["\"complicataed\"\\\\__\"name"][0].field)"), 
             cjson);
         ASSERT_EQ(v.size(), 1);
         ASSERT_EQ(v.back()->type(), json_spirit::bool_type);
-        ASSERT_EQ(v.back()->get_bool(), true);*/
+        ASSERT_EQ(v.back()->get_bool(), true);
     }
 }
 
