@@ -264,6 +264,7 @@ Result_t t2s(const std::string& s)
 enum class estate_t
 {
     root,
+    star,
     dot_or_sq,
     dot_or_field,
     second_dot,
@@ -301,14 +302,6 @@ void request_by_jpath_impl(estate_t state,
     using string_t = typename Value_t::String_type;
     using char_t   = typename string_t::value_type;
     //
-    // Exit point.
-    //
-    if (beg == end)
-    {
-        values.push_back(&value);
-        return;
-    }
-    //
     // Finite automata.
     //
     switch (state)
@@ -322,35 +315,11 @@ void request_by_jpath_impl(estate_t state,
                 //
                 case L'*':
                 {
-                    switch (value.type())
-                    {
-                        case json_spirit::obj_type:
-                        {
-                            for (auto& p : value.get_obj())
-                            {
-                                request_by_jpath_impl(estate_t::dot_or_sq,
-                                                      beg + 1,
-                                                      end,
-                                                      get_second(p),
-                                                      values);
-                            }
-                            break;
-                        }
-                        case json_spirit::array_type:
-                        {
-                            for (auto& v : value.get_array())
-                            {
-                                request_by_jpath_impl(estate_t::dot_or_sq,
-                                                      beg + 1,
-                                                      end,
-                                                      v,
-                                                      values);
-                            }
-                            break;
-                        }
-                        default:
-                            break;
-                    }
+                    request_by_jpath_impl(estate_t::star,
+                                          beg + 1,
+                                          end,
+                                          value,
+                                          values);
                     break;
                 }
                 //
@@ -368,9 +337,46 @@ void request_by_jpath_impl(estate_t state,
             }
             break;
         }
+        case estate_t::star:
+        {
+            switch (value.type())
+            {
+                case json_spirit::obj_type:
+                {
+                    for (auto& p : value.get_obj())
+                    {
+                        request_by_jpath_impl(estate_t::dot_or_sq,
+                                              beg,
+                                              end,
+                                              get_second(p),
+                                              values);
+                    }
+                    break;
+                }
+                case json_spirit::array_type:
+                {
+                    for (auto& v : value.get_array())
+                    {
+                        request_by_jpath_impl(estate_t::dot_or_sq,
+                                              beg,
+                                              end,
+                                              v,
+                                              values);
+                    }
+                    break;
+                }
+                default:
+                    break;
+            }
+            break;
+        }
         case estate_t::dot_or_sq:
         {
-            
+            if (beg == end)
+            {
+                values.push_back(&value);
+                break;
+            }
             switch (widest(*beg))
             {
                 case L'.':
@@ -475,122 +481,162 @@ void request_by_jpath_impl(estate_t state,
                                               values);
                         break;
                     }
-                    if (*beg == static_cast<char_t>('"'))
+                    switch (widest(*beg))
                     {
-                        ++beg;
                         //
-                        // We are dealing here only with objects.
+                        // Seems we are dealing with an object.
                         //
-                        if (value.type() != json_spirit::obj_type)
+                        case L'"':
                         {
-                            break;
-                        }
-                        string_t name;
-                        //
-                        // Looking for closing '"' symbol.
-                        //
-                        char_t previous_ch = static_cast<char_t>('\0');
-                        auto it = std::find_if(beg, end, [&previous_ch, &name](char_t ch)
-                        {
-                            switch (widest(ch))
+                            ++beg;
+                            //
+                            // We are dealing here only with objects.
+                            //
+                            if (value.type() != json_spirit::obj_type)
                             {
-                                case L'"':
-                                    switch (widest(previous_ch))
-                                    {
-                                        case L'\\':
-                                            previous_ch = '\0';
-                                            name.push_back(ch);
-                                            return false;
-                                        default:
-                                            return true;
-                                    }
-                                    break;
-                                case L'\\':
-                                    switch (widest(previous_ch))
-                                    {
-                                        case L'\\':
-                                            previous_ch = '\0';
-                                            name.push_back(ch);
-                                            return false;
-                                        default:
-                                            previous_ch = '\\';
-                                            return false;
-                                    }
-                                    break;
-                                default:
-                                    name.push_back(ch);
-                                    return false;
+                                break;
                             }
-                        });
-                        //
-                        // If '"' wasn't found or if it goes right after opening one, like this "".
-                        //
-                        if (it == beg || it == end || *it != static_cast<char_t>('"'))
+                            string_t name;
+                            //
+                            // Looking for closing '"' symbol.
+                            //
+                            char_t previous_ch = static_cast<char_t>('\0');
+                            auto it = std::find_if(beg, end, [&previous_ch, &name](char_t ch)
+                            {
+                                switch (widest(ch))
+                                {
+                                    case L'"':
+                                        switch (widest(previous_ch))
+                                        {
+                                            case L'\\':
+                                                previous_ch = '\0';
+                                                name.push_back(ch);
+                                                return false;
+                                            default:
+                                                return true;
+                                        }
+                                        break;
+                                    case L'\\':
+                                        switch (widest(previous_ch))
+                                        {
+                                            case L'\\':
+                                                previous_ch = '\0';
+                                                name.push_back(ch);
+                                                return false;
+                                            default:
+                                                previous_ch = '\\';
+                                                return false;
+                                        }
+                                        break;
+                                    default:
+                                        name.push_back(ch);
+                                        return false;
+                                }
+                            });
+                            //
+                            // If '"' wasn't found or if it goes right after opening one, like this "".
+                            //
+                            if (it == beg || it == end || *it != static_cast<char_t>('"'))
+                            {
+                                break;
+                            }
+                            //
+                            // Let's check if we have closing square bracket.
+                            //
+                            if (++it == end || *it != static_cast<char_t>(']'))
+                            {
+                                break;
+                            }
+                            //
+                            // Looking for child value.
+                            //
+                            auto& obj = value.get_obj();
+                            auto child_it = find_field(name, obj);
+                            if (child_it == obj.end())
+                            {
+                                break;
+                            }
+                            request_by_jpath_impl(estate_t::dot_or_sq,
+                                                  it + 1,
+                                                  end,
+                                                  get_second(*child_it),
+                                                  values);
+                            break;
+                        }
+                        case L'(':
+                        {
+                            break;
+                        }
+                        case L'?':
                         {
                             break;
                         }
                         //
-                        // Let's check if we have closing square bracket.
+                        // All fields or array elements. It's equivalent to .* syntax.
                         //
-                        if (++it == end || *it != static_cast<char_t>(']'))
+                        case L'*':
                         {
+                            ++beg;
+                            if (beg == end || *beg != static_cast<char_t>(']'))
+                            {
+                                break;
+                            }
+
                             break;
                         }
                         //
-                        // Looking for child value.
+                        // Seems we are dealing here with arrays.
                         //
-                        auto& obj = value.get_obj();
-                        auto child_it = find_field(name, obj);
-                        if (child_it == obj.end())
+                        default:
                         {
+                            if (value.type() != json_spirit::array_type)
+                            {
+                                break;
+                            }
+                            auto it = std::find_if(beg, end, [](char_t ch)
+                            {
+                                return ch < static_cast<char_t>('0') || static_cast<char_t>('9') < ch;
+                            });
+                            //
+                            // If ']' wasn't found or if it goes right after '[', like this: [].
+                            //
+                            if (it == beg || it == end || *it != static_cast<char_t>(']'))
+                            {
+                                break;
+                            }
+                            //
+                            // According to previour find_if call we know that sequence [beg..it) contains only didits.
+                            //
+                            auto index = std::stoul(string_t(beg, it));
+                            auto& array = value.get_array();
+                            //
+                            // If required index is out of range we didn't find anything here.
+                            //
+                            if (array.size() <= index)
+                            {
+                                break;
+                            }
+                            request_by_jpath_impl(estate_t::dot_or_sq,
+                                                  it + 1,
+                                                  end,
+                                                  array[index],
+                                                  values);
                             break;
                         }
-                        request_by_jpath_impl(estate_t::dot_or_sq,
-                                              it + 1,
-                                              end,
-                                              get_second(*child_it),
-                                              values);
-                        break;
                     }
-                    //
-                    // We are dealing here only with arrays.
-                    //
-                    if (value.type() != json_spirit::array_type)
-                    {
-                        break;
-                    }
-                    auto it = std::find_if(beg, end, [](char_t ch)
-                    {
-                        return ch < static_cast<char_t>('0') || static_cast<char_t>('9') < ch;
-                    });
-                    //
-                    // If ']' wasn't found or if it goes right after '[', like this: [].
-                    //
-                    if (it == beg || it == end || *it != static_cast<char_t>(']'))
-                    {
-                        break;
-                    }
-                    //
-                    // According to previour find_if call we know that sequence [beg..it) contains only didits.
-                    //
-                    auto index  = std::stoul(string_t(beg, it));
-                    auto& array = value.get_array();
-                    //
-                    // If required index is out of range we didn't find anything here.
-                    //
-                    if (array.size() <= index)
-                    {
-                        break;
-                    }
-                    request_by_jpath_impl(estate_t::dot_or_sq,
-                                          it + 1,
-                                          end,
-                                          array[index],
-                                          values);
                     break;
                 }
                 default:
                     break;
+            }
+            break;
+        }
+        case estate_t::dot_or_field:
+        {
+            if (beg == end)
+            {
+                values.push_back(&value);
+                break;
             }
             break;
         }
