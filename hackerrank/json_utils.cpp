@@ -427,6 +427,11 @@ void request_by_jpath_impl(estate_t state,
                         }
                         case L'*':
                         {
+                            request_by_jpath_impl(estate_t::star,
+                                                  beg + 1,
+                                                  end,
+                                                  value,
+                                                  values);
                             break;
                         }
                         case L'$':
