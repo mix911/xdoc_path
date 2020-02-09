@@ -268,6 +268,7 @@ enum class estate_t
     dot_or_sq,
     dot_or_field,
     second_dot,
+    end,
 };
 
 template<typename Iterator_t, typename Value_t>
@@ -374,7 +375,11 @@ void request_by_jpath_impl(estate_t state,
         {
             if (beg == end)
             {
-                values.push_back(&value);
+                request_by_jpath_impl(estate_t::end,
+                                      beg,
+                                      end,
+                                      value,
+                                      values);
                 break;
             }
             switch (widest(*beg))
@@ -581,7 +586,11 @@ void request_by_jpath_impl(estate_t state,
                             {
                                 break;
                             }
-
+                            request_by_jpath_impl(estate_t::star,
+                                                  beg + 1,
+                                                  end,
+                                                  value,
+                                                  values);
                             break;
                         }
                         //
@@ -635,9 +644,18 @@ void request_by_jpath_impl(estate_t state,
         {
             if (beg == end)
             {
-                values.push_back(&value);
+                request_by_jpath_impl(estate_t::end,
+                                      beg,
+                                      end,
+                                      value,
+                                      values);
                 break;
             }
+            break;
+        }
+        case estate_t::end:
+        {
+            values.push_back(&value);
             break;
         }
         default:
