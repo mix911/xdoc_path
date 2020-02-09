@@ -266,9 +266,8 @@ enum class estate_t
     root,
     star,
     dot_or_sq,
-    dot_or_field,
     second_dot,
-    end,
+    exit,
 };
 
 template<typename Iterator_t, typename Value_t>
@@ -375,7 +374,7 @@ void request_by_jpath_impl(estate_t state,
         {
             if (beg == end)
             {
-                request_by_jpath_impl(estate_t::end,
+                request_by_jpath_impl(estate_t::exit,
                                       beg,
                                       end,
                                       value,
@@ -392,7 +391,7 @@ void request_by_jpath_impl(estate_t state,
                     //
                     if (beg == end)
                     {
-                        request_by_jpath_impl(estate_t::dot_or_field,
+                        request_by_jpath_impl(estate_t::exit,
                                               beg,
                                               end,
                                               value,
@@ -479,11 +478,6 @@ void request_by_jpath_impl(estate_t state,
                     //
                     if (beg == end)
                     {
-                        request_by_jpath_impl(estate_t::dot_or_field,
-                                              beg,
-                                              end,
-                                              value,
-                                              values);
                         break;
                     }
                     switch (widest(*beg))
@@ -640,20 +634,7 @@ void request_by_jpath_impl(estate_t state,
             }
             break;
         }
-        case estate_t::dot_or_field:
-        {
-            if (beg == end)
-            {
-                request_by_jpath_impl(estate_t::end,
-                                      beg,
-                                      end,
-                                      value,
-                                      values);
-                break;
-            }
-            break;
-        }
-        case estate_t::end:
+        case estate_t::exit:
         {
             values.push_back(&value);
             break;

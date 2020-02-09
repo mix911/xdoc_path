@@ -128,16 +128,30 @@ TYPED_TEST(RequestByJPathAllInOneLevelObjectTest, Types)
     "field2" : "2",
     "field3" : [1, 2, 3],
     "field4" : false,
-    "field5" : { }
+    "field5" : { },
+    "field6" : { "x" : 1 },
+    "field7" : { "x" : 2 },
+    "field8" : { "x" : 3 }
 })";
+    using string_t = typename TypeParam::String_type;
     auto json = make_json<TypeParam>(t2s<TypeParam::String_type>(sc_json));
     const auto& cjson = json;
     auto t = cjson.type();
     auto v = request_by_jpath(t2s<TypeParam::String_type>(L"*"), cjson);
-    ASSERT_EQ(v.size(), 5);
+    ASSERT_EQ(v.size(), 8);
     ASSERT_EQ(v[0]->type(), json_spirit::int_type   );  ASSERT_EQ(v[0]->get_int()           , 1                                 );
     ASSERT_EQ(v[1]->type(), json_spirit::str_type   );  ASSERT_EQ(v[1]->get_str()           , t2s<TypeParam::String_type>(L"2") );
     ASSERT_EQ(v[2]->type(), json_spirit::array_type );  ASSERT_EQ(v[2]->get_array().size()  , 3                                 );
     ASSERT_EQ(v[3]->type(), json_spirit::bool_type  );  ASSERT_EQ(v[3]->get_bool()          , false                             );
     ASSERT_EQ(v[4]->type(), json_spirit::obj_type   );  ASSERT_EQ(v[4]->get_obj().size()    , 0                                 );
+    v = request_by_jpath(t2s<string_t>(L"*.x"), cjson);
+    ASSERT_EQ(v.size(), 3);
+    ASSERT_EQ(v[0]->get_int(), 1);
+    ASSERT_EQ(v[1]->get_int(), 2);
+    ASSERT_EQ(v[2]->get_int(), 3);
+    v = request_by_jpath(t2s<string_t>(L"*[\"x\"]"), cjson);
+    ASSERT_EQ(v.size(), 3);
+    ASSERT_EQ(v[0]->get_int(), 1);
+    ASSERT_EQ(v[1]->get_int(), 2);
+    ASSERT_EQ(v[2]->get_int(), 3);
 }
