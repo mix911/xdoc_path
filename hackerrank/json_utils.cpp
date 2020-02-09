@@ -268,6 +268,11 @@ enum class estate_t
     dot_or_sq,
     sq_brackets,
     second_dot,
+    expression,
+    filter,
+    int_index,
+    str_index,
+    field_name,
     exit,
 };
 
@@ -436,7 +441,7 @@ void request_by_jpath_impl(estate_t state,
                         }
                         case L'$':
                         {
-                            request_by_jpath_impl(estate_t::root, 
+                            request_by_jpath_impl(estate_t::root,
                                                   beg,
                                                   end,
                                                   value,
@@ -445,36 +450,10 @@ void request_by_jpath_impl(estate_t state,
                         }
                         default:
                         {
-                            //
-                            // It works only for objects.
-                            //
-                            if (value.type() != json_spirit::obj_type)
-                            {
-                                break;
-                            }
-                            //
-                            // Creating field name.
-                            //
-                            auto it = std::find_if(beg, end, [](char_t ch)
-                            {
-                                return ch == static_cast<char_t>('.') || ch == static_cast<char_t>('[');
-                            });
-                            string_t name(beg, it);
-                            //
-                            // Looking for field by name.
-                            //
-                            auto obj_it = find_field(name, value.get_obj());
-                            if (obj_it == value.get_obj().end())
-                            {
-                                break;
-                            }
-                            //
-                            // Requesting for found by name value.
-                            //
-                            request_by_jpath_impl(estate_t::dot_or_sq,
-                                                  it,
+                            request_by_jpath_impl(estate_t::field_name,
+                                                  beg,
                                                   end,
-                                                  get_second(*obj_it),
+                                                  value,
                                                   values);
                             break;
                         }
@@ -511,87 +490,29 @@ void request_by_jpath_impl(estate_t state,
                 //
                 case L'"':
                 {
-                    ++beg;
-                    //
-                    // We are dealing here only with objects.
-                    //
-                    if (value.type() != json_spirit::obj_type)
-                    {
-                        break;
-                    }
-                    string_t name;
-                    //
-                    // Looking for closing '"' symbol.
-                    //
-                    char_t previous_ch = static_cast<char_t>('\0');
-                    auto it = std::find_if(beg, end, [&previous_ch, &name](char_t ch)
-                    {
-                        switch (widest(ch))
-                        {
-                            case L'"':
-                                switch (widest(previous_ch))
-                                {
-                                    case L'\\':
-                                        previous_ch = '\0';
-                                        name.push_back(ch);
-                                        return false;
-                                    default:
-                                        return true;
-                                }
-                                break;
-                            case L'\\':
-                                switch (widest(previous_ch))
-                                {
-                                    case L'\\':
-                                        previous_ch = '\0';
-                                        name.push_back(ch);
-                                        return false;
-                                    default:
-                                        previous_ch = '\\';
-                                        return false;
-                                }
-                                break;
-                            default:
-                                name.push_back(ch);
-                                return false;
-                        }
-                    });
-                    //
-                    // If '"' wasn't found or if it goes right after opening one, like this "".
-                    //
-                    if (it == beg || it == end || *it != static_cast<char_t>('"'))
-                    {
-                        break;
-                    }
-                    //
-                    // Let's check if we have closing square bracket.
-                    //
-                    if (++it == end || *it != static_cast<char_t>(']'))
-                    {
-                        break;
-                    }
-                    //
-                    // Looking for child value.
-                    //
-                    auto& obj = value.get_obj();
-                    auto child_it = find_field(name, obj);
-                    if (child_it == obj.end())
-                    {
-                        break;
-                    }
-                    request_by_jpath_impl(estate_t::dot_or_sq,
-                                          it + 1,
+                    request_by_jpath_impl(estate_t::str_index,
+                                          beg + 1,
                                           end,
-                                          get_second(*child_it),
+                                          value,
                                           values);
                     break;
                 }
                 case L'(':
                 {
+                    request_by_jpath_impl(estate_t::expression,
+                                          beg + 1,
+                                          end,
+                                          value,
+                                          values);
                     break;
                 }
                 case L'?':
                 {
+                    request_by_jpath_impl(estate_t::filter,
+                                          beg + 1,
+                                          end,
+                                          value,
+                                          values);
                     break;
                 }
                 //
@@ -616,41 +537,173 @@ void request_by_jpath_impl(estate_t state,
                 //
                 default:
                 {
-                    if (value.type() != json_spirit::array_type)
-                    {
-                        break;
-                    }
-                    auto it = std::find_if(beg, end, [](char_t ch)
-                    {
-                        return ch < static_cast<char_t>('0') || static_cast<char_t>('9') < ch;
-                    });
-                    //
-                    // If ']' wasn't found or if it goes right after '[', like this: [].
-                    //
-                    if (it == beg || it == end || *it != static_cast<char_t>(']'))
-                    {
-                        break;
-                    }
-                    //
-                    // According to previour find_if call we know that sequence [beg..it) contains only didits.
-                    //
-                    auto index = std::stoul(string_t(beg, it));
-                    auto& array = value.get_array();
-                    //
-                    // If required index is out of range we didn't find anything here.
-                    //
-                    if (array.size() <= index)
-                    {
-                        break;
-                    }
-                    request_by_jpath_impl(estate_t::dot_or_sq,
-                                          it + 1,
+                    request_by_jpath_impl(estate_t::int_index,
+                                          beg,
                                           end,
-                                          array[index],
+                                          value,
                                           values);
                     break;
                 }
             }
+            break;
+        }
+        case estate_t::second_dot:
+        {
+            break;
+        }
+        case estate_t::expression:
+        {
+            break;
+        }
+        case estate_t::filter:
+        {
+            break;
+        }
+        case estate_t::int_index:
+        {
+            if (value.type() != json_spirit::array_type)
+            {
+                break;
+            }
+            auto it = std::find_if(beg, end, [](char_t ch)
+            {
+                return ch < static_cast<char_t>('0') || static_cast<char_t>('9') < ch;
+            });
+            //
+            // If ']' wasn't found or if it goes right after '[', like this: [].
+            //
+            if (it == beg || it == end || *it != static_cast<char_t>(']'))
+            {
+                break;
+            }
+            //
+            // According to previour find_if call we know that sequence [beg..it) contains only didits.
+            //
+            auto index = std::stoul(string_t(beg, it));
+            auto& array = value.get_array();
+            //
+            // If required index is out of range we didn't find anything here.
+            //
+            if (array.size() <= index)
+            {
+                break;
+            }
+            request_by_jpath_impl(estate_t::dot_or_sq,
+                                  it + 1,
+                                  end,
+                                  array[index],
+                                  values);
+            break;
+        }
+        case estate_t::str_index:
+        {
+            //
+                    // We are dealing here only with objects.
+                    //
+            if (value.type() != json_spirit::obj_type)
+            {
+                break;
+            }
+            string_t name;
+            //
+            // Looking for closing '"' symbol.
+            //
+            char_t previous_ch = static_cast<char_t>('\0');
+            auto it = std::find_if(beg, end, [&previous_ch, &name](char_t ch)
+            {
+                switch (widest(ch))
+                {
+                    case L'"':
+                        switch (widest(previous_ch))
+                        {
+                            case L'\\':
+                                previous_ch = '\0';
+                                name.push_back(ch);
+                                return false;
+                            default:
+                                return true;
+                        }
+                        break;
+                    case L'\\':
+                        switch (widest(previous_ch))
+                        {
+                            case L'\\':
+                                previous_ch = '\0';
+                                name.push_back(ch);
+                                return false;
+                            default:
+                                previous_ch = '\\';
+                                return false;
+                        }
+                        break;
+                    default:
+                        name.push_back(ch);
+                        return false;
+                }
+            });
+            //
+            // If '"' wasn't found or if it goes right after opening one, like this "".
+            //
+            if (it == beg || it == end || *it != static_cast<char_t>('"'))
+            {
+                break;
+            }
+            //
+            // Let's check if we have closing square bracket.
+            //
+            if (++it == end || *it != static_cast<char_t>(']'))
+            {
+                break;
+            }
+            //
+            // Looking for child value.
+            //
+            auto& obj = value.get_obj();
+            auto child_it = find_field(name, obj);
+            if (child_it == obj.end())
+            {
+                break;
+            }
+            request_by_jpath_impl(estate_t::dot_or_sq,
+                                  it + 1,
+                                  end,
+                                  get_second(*child_it),
+                                  values);
+            break;
+        }
+        case estate_t::field_name:
+        {
+            //
+                            // It works only for objects.
+                            //
+            if (value.type() != json_spirit::obj_type)
+            {
+                break;
+            }
+            //
+            // Creating field name.
+            //
+            auto it = std::find_if(beg, end, [](char_t ch)
+            {
+                return ch == static_cast<char_t>('.') || ch == static_cast<char_t>('[');
+            });
+            string_t name(beg, it);
+            //
+            // Looking for field by name.
+            //
+            auto obj_it = find_field(name, value.get_obj());
+            if (obj_it == value.get_obj().end())
+            {
+                break;
+            }
+            //
+            // Requesting for found by name value.
+            //
+            request_by_jpath_impl(estate_t::dot_or_sq,
+                                  it,
+                                  end,
+                                  get_second(*obj_it),
+                                  values);
             break;
         }
         case estate_t::exit:
