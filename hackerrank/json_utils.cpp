@@ -565,34 +565,65 @@ void request_by_jpath_impl(estate_t state,
             {
                 break;
             }
+            //
+            // Start index.
+            //
             auto it = std::find_if(beg, end, [](char_t ch)
             {
                 return ch < static_cast<char_t>('0') || static_cast<char_t>('9') < ch;
             });
-            //
-            // If ']' wasn't found or if it goes right after '[', like this: [].
-            //
-            if (it == beg || it == end || *it != static_cast<char_t>(']'))
+            if (it == beg || it == end || (*it != static_cast<char_t>(']') && *it != static_cast<char_t>(':')))
             {
                 break;
             }
-            //
-            // According to previour find_if call we know that sequence [beg..it) contains only didits.
-            //
-            auto index = std::stoul(string_t(beg, it));
+            auto start_index = static_cast<size_t>(std::stoul(string_t(beg, it)));
+            auto end_index   = start_index + 1;
+            auto step        = 1;
+            if (*it == static_cast<char_t>(':'))
+            {
+                //
+                // End index. 
+                //
+                beg = ++it;
+                it = std::find_if(beg, end, [](char_t ch)
+                {
+                    return ch < static_cast<char_t>('0') || static_cast<char_t>('9') < ch;
+                });
+                if (it == beg || it == end || (*it != static_cast<char_t>(']') && *it != static_cast<char_t>(':')))
+                {
+                    break;
+                }
+                end_index = std::stoul(string_t(beg, it));
+                if (*it == static_cast<char>(':'))
+                {
+                    //
+                    // Step. 
+                    //
+                    beg = ++it;
+                    it = std::find_if(beg, end, [](char_t ch)
+                    {
+                        return ch < static_cast<char_t>('0') || static_cast<char_t>('9') < ch;
+                    });
+                    if (it == beg || it == end || *it != static_cast<char_t>(']'))
+                    {
+                        break;
+                    }
+                    step = std::stoul(string_t(beg, it));
+                }
+            }
             auto& array = value.get_array();
-            //
-            // If required index is out of range we didn't find anything here.
-            //
-            if (array.size() <= index)
+            if (array.size() <= start_index)
             {
                 break;
             }
-            request_by_jpath_impl(estate_t::dot_or_sq,
-                                  it + 1,
-                                  end,
-                                  array[index],
-                                  values);
+            for (auto index = start_index; index < std::min(end_index, array.size()); index += step)
+            {
+                request_by_jpath_impl(estate_t::dot_or_sq,
+                                      it + 1,
+                                      end,
+                                      array[index],
+                                      values);
+            }
             break;
         }
         case estate_t::str_index:

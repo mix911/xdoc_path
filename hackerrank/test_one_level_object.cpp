@@ -48,7 +48,8 @@ TYPED_TEST(RequestByJPathOneInOneLevelObjectTest, Types)
         "\"complicataed\"\\\\__\"name" : [{
             "field" : true
         }]
-    }
+    },
+    "field6" : [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
 })";
     using string_t = typename TypeParam::String_type;
     {
@@ -111,7 +112,22 @@ TYPED_TEST(RequestByJPathOneInOneLevelObjectTest, Types)
         v = request_by_jpath(t2s<string_t>(LR"($.field3[*])"), cjson);
         ASSERT_EQ(v.size(), 3);
         v = request_by_jpath(t2s<string_t>(L"$[*]"), cjson);
-        ASSERT_EQ(v.size(), 5);
+        ASSERT_EQ(v.size(), 6);
+        v = request_by_jpath(t2s<string_t>(LR"($.field6[0:3])"), cjson);
+        ASSERT_EQ(v.size(), 3);
+        ASSERT_EQ(v[0]->get_int(), 0);
+        ASSERT_EQ(v[1]->get_int(), 1);
+        ASSERT_EQ(v[2]->get_int(), 2);
+        v = request_by_jpath(t2s<string_t>(LR"($.field6[3:7])"), cjson);
+        ASSERT_EQ(v.size(), 4);
+        ASSERT_EQ(v[0]->get_int(), 3);
+        ASSERT_EQ(v[1]->get_int(), 4);
+        ASSERT_EQ(v[2]->get_int(), 5);
+        ASSERT_EQ(v[3]->get_int(), 6);
+        v = request_by_jpath(t2s<string_t>(LR"($.field6[3:7:2])"), cjson);
+        ASSERT_EQ(v.size(), 2);
+        ASSERT_EQ(v[0]->get_int(), 3);
+        ASSERT_EQ(v[1]->get_int(), 5);
     }
 }
 
