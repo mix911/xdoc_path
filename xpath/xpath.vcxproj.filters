@@ -17,10 +17,10 @@
     <ClCompile Include="json_utils.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="test_interface.cpp">
+    <ClCompile Include="test_get_value.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="test_one_level_object.cpp">
+    <ClCompile Include="test_request_by_jpath.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

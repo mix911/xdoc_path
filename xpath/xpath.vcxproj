@@ -160,8 +160,8 @@
   <ItemGroup>
     <ClCompile Include="json_utils.cpp" />
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="test_interface.cpp" />
-    <ClCompile Include="test_one_level_object.cpp" />
+    <ClCompile Include="test_get_value.cpp" />
+    <ClCompile Include="test_request_by_jpath.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="json_utils.h" />
