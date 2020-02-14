@@ -263,7 +263,7 @@ Result_t t2s(const std::string& s)
 
 enum class estate_t
 {
-    root,
+    node,
     star,
     dot_or_sq,
     sq_brackets,
@@ -312,8 +312,20 @@ void request_by_jpath_impl(estate_t state,
     //
     switch (state)
     {
-        case estate_t::root:
+        case estate_t::node:
         {
+            //
+                    // Nothing after dot.
+                    //
+            if (beg == end)
+            {
+                request_by_jpath_impl(estate_t::exit,
+                                      beg,
+                                      end,
+                                      value,
+                                      values);
+                break;
+            }
             switch (widest(*beg))
             {
                 //
@@ -441,7 +453,7 @@ void request_by_jpath_impl(estate_t state,
                         }
                         case L'$':
                         {
-                            request_by_jpath_impl(estate_t::root,
+                            request_by_jpath_impl(estate_t::node,
                                                   beg,
                                                   end,
                                                   value,
@@ -756,7 +768,7 @@ std::vector<Value_t*> request_by_jpath(const String_t& jpath, Value_t& value)
         return { };
     }
     std::vector<Value_t*> result_values;
-    request_by_jpath_impl(estate_t::root, jpath.begin(), jpath.end(), value, result_values);
+    request_by_jpath_impl(estate_t::node, jpath.begin(), jpath.end(), value, result_values);
     return result_values;
 }
 
