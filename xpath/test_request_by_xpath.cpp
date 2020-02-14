@@ -9,8 +9,8 @@ TEST(TestRequestByXPathSuit, TestRequestByXPath)
     <nodes name="Value">
         <node nodeName="Value1">Text1</node>
         <node nodeName="Value2"/>
-        <node nodeName="Value3"/>
-        <node nodeName="Value4"/>
+        <node nodeName="Value3">Text3<subnodes/>Text33</node>
+        <node nodeName="Value4"><![CDATA[Text4]]></node>
     </nodes>
 </root1>
 <root2>
@@ -41,4 +41,9 @@ TEST(TestRequestByXPathSuit, TestRequestByXPath)
     ASSERT_EQ(dynamic_cast<TiXmlAttribute*>(nodes[3])->Value(), string("Value4"));
     nodes = request_by_xpath("/root1/././././././nodes", &doc);
     ASSERT_EQ(nodes.size(), 1);
+    nodes = request_by_xpath("/root1/nodes/node/text()", &doc);
+    ASSERT_EQ(dynamic_cast<TiXmlText*>(nodes[0])->Value(), string("Text1"));
+    ASSERT_EQ(dynamic_cast<TiXmlText*>(nodes[1])->Value(), string("Text3"));
+    ASSERT_EQ(dynamic_cast<TiXmlText*>(nodes[2])->Value(), string("Text33"));
+    ASSERT_EQ(dynamic_cast<TiXmlText*>(nodes[3])->Value(), string("Text4"));
 }
