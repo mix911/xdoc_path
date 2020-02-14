@@ -7,6 +7,8 @@ enum class estate_t
     name_or_attribute,
     name,
     attr,
+    parent_or_current,
+    parent,
     exit,
 };
 
@@ -53,6 +55,11 @@ void request_by_xpath_impl(estate_t state,
                     request_by_xpath_impl(estate_t::attr, beg + 1, end, base, nodes);
                     break;
                 }
+                case '.':
+                {
+                    request_by_xpath_impl(estate_t::parent_or_current, beg + 1, end, base, nodes);
+                    break;
+                }
                 default:
                 {
                     request_by_xpath_impl(estate_t::name, beg, end, base, nodes);
@@ -90,6 +97,28 @@ void request_by_xpath_impl(estate_t state,
                 if (::strcmp(attr->Name(), name.c_str()) == 0)
                 {
                     request_by_xpath_impl(estate_t::exit, it, end, attr, nodes);
+                    break;
+                }
+            }
+            break;
+        }
+        case estate_t::parent_or_current:
+        {
+            if (beg == end)
+            {
+                request_by_xpath_impl(estate_t::exit, beg, end, base, nodes);
+                break;
+            }
+            switch (*beg)
+            {
+                case '.':
+                {
+                    request_by_xpath_impl(estate_t::parent, beg + 1, end, base, nodes);
+                    break;
+                }
+                case '/':
+                {
+                    request_by_xpath_impl(estate_t::node, beg, end, base, nodes);
                     break;
                 }
             }

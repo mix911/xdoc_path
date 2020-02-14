@@ -7,7 +7,7 @@ TEST(TestRequestByXPathSuit, TestRequestByXPath)
 {
     static const char* c_xml = R"(<root1>
     <nodes name="Value">
-        <node nodeName="Value1"/>
+        <node nodeName="Value1">Text1</node>
         <node nodeName="Value2"/>
         <node nodeName="Value3"/>
         <node nodeName="Value4"/>
@@ -39,4 +39,6 @@ TEST(TestRequestByXPathSuit, TestRequestByXPath)
     ASSERT_EQ(dynamic_cast<TiXmlAttribute*>(nodes[1])->Value(), string("Value2"));
     ASSERT_EQ(dynamic_cast<TiXmlAttribute*>(nodes[2])->Value(), string("Value3"));
     ASSERT_EQ(dynamic_cast<TiXmlAttribute*>(nodes[3])->Value(), string("Value4"));
+    nodes = request_by_xpath("/root1/././././././nodes", &doc);
+    ASSERT_EQ(nodes.size(), 1);
 }
