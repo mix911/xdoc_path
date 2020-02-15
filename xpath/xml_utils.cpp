@@ -1,5 +1,6 @@
 #include "xml_utils.h"
 #include <algorithm>
+#include <queue>
 
 enum class estate_t
 {
@@ -30,142 +31,149 @@ struct State
 
 void request_by_xpath_impl(State s, std::vector<TiXmlBase*>& nodes)
 {
-    switch (s.state)
+    std::queue<State> states;
+    states.push(s);
+    while (states.empty() == false)
     {
-        case estate_t::node:
+        s = states.front();
+        states.pop();
+        switch (s.state)
         {
-            if (s.beg == s.end)
+            case estate_t::node:
             {
-                request_by_xpath_impl(State(estate_t::exit, s.beg, s.end, s.node), nodes);
+                if (s.beg == s.end)
+                {
+                    states.push(State(estate_t::exit, s.beg, s.end, s.node));
+                    break;
+                }
+                switch (*s.beg)
+                {
+                    case '/':
+                    {
+                        states.push(State(estate_t::name_or_attribute, s.beg + 1, s.end, s.node));
+                        break;
+                    }
+                    default:
+                    {
+                        break;
+                    }
+                }
                 break;
             }
-            switch (*s.beg)
+            case estate_t::name_or_attribute:
             {
-                case '/':
+                if (s.beg == s.end)
                 {
-                    request_by_xpath_impl(State(estate_t::name_or_attribute, s.beg + 1, s.end, s.node), nodes);
+                    states.push(State(estate_t::exit, s.beg, s.end, s.node));
                     break;
                 }
-                default:
+                switch (*s.beg)
                 {
-                    break;
+                    case '@':
+                    {
+                        states.push(State(estate_t::attr, s.beg + 1, s.end, s.node));
+                        break;
+                    }
+                    case '.':
+                    {
+                        states.push(State(estate_t::parent_or_current, s.beg + 1, s.end, s.node));
+                        break;
+                    }
+                    default:
+                    {
+                        states.push(State(estate_t::name, s.beg, s.end, s.node));
+                        break;
+                    }
                 }
-            }
-            break;
-        }
-        case estate_t::name_or_attribute:
-        {
-            if (s.beg == s.end)
-            {
-                request_by_xpath_impl(State(estate_t::exit, s.beg, s.end, s.node), nodes);
                 break;
             }
-            switch (*s.beg)
+            case estate_t::name:
             {
-                case '@':
+                auto it = std::find_if(s.beg, s.end, [](char ch)
                 {
-                    request_by_xpath_impl(State(estate_t::attr, s.beg + 1, s.end, s.node), nodes);
+                    return ch == '[' || ch == '/';
+                });
+                std::string name(s.beg, it);
+                if (name == "text()")
+                {
+                    states.push(State(estate_t::text, it, s.end, s.node));
                     break;
                 }
-                case '.':
+                for (auto child = s.node->FirstChild(name.c_str());
+                     child != nullptr;
+                     child = child->NextSibling(name.c_str()))
                 {
-                    request_by_xpath_impl(State(estate_t::parent_or_current, s.beg + 1, s.end, s.node), nodes);
-                    break;
+                    states.push(State(estate_t::node, it, s.end, child));
                 }
-                default:
-                {
-                    request_by_xpath_impl(State(estate_t::name, s.beg, s.end, s.node), nodes);
-                    break;
-                }
-            }
-            break;
-        }
-        case estate_t::name:
-        {
-            auto it = std::find_if(s.beg, s.end, [](char ch)
-            {
-                return ch == '[' || ch == '/';
-            });
-            std::string name(s.beg, it);
-            if (name == "text()")
-            {
-                request_by_xpath_impl(State(estate_t::text, it, s.end, s.node), nodes);
                 break;
             }
-            for (auto child = s.node->FirstChild(name.c_str());
-                 child != nullptr;
-                 child = child->NextSibling(name.c_str()))
+            case estate_t::attr:
             {
-                request_by_xpath_impl(State(estate_t::node, it, s.end, child), nodes);
+                if (s.node->Type() != TiXmlNode::TINYXML_ELEMENT)
+                {
+                    break;
+                }
+                auto it = std::find_if(s.beg, s.end, [](char ch)
+                {
+                    return ch == '/';
+                });
+                std::string name(s.beg, it);
+                for (auto attr = ((TiXmlElement*)s.node)->FirstAttribute(); attr != nullptr; attr = attr->Next())
+                {
+                    if (::strcmp(attr->Name(), name.c_str()) == 0)
+                    {
+                        nodes.push_back(attr);
+                        break;
+                    }
+                }
+                break;
             }
-            break;
-        }
-        case estate_t::attr:
-        {
-            if (s.node->Type() != TiXmlNode::TINYXML_ELEMENT)
+            case estate_t::parent_or_current:
+            {
+                if (s.beg == s.end)
+                {
+                    states.push(State(estate_t::exit, s.beg, s.end, s.node));
+                    break;
+                }
+                switch (*s.beg)
+                {
+                    case '.':
+                    {
+                        states.push(State(estate_t::parent, s.beg + 1, s.end, s.node));
+                        break;
+                    }
+                    case '/':
+                    {
+                        states.push(State(estate_t::node, s.beg, s.end, s.node));
+                        break;
+                    }
+                }
+                break;
+            }
+            case estate_t::text:
+            {
+                if (s.node->Type() != TiXmlNode::TINYXML_ELEMENT)
+                {
+                    break;
+                }
+                for (auto child = s.node->FirstChild(); child != nullptr; child = child->NextSibling())
+                {
+                    if (auto text = child->ToText())
+                    {
+                        nodes.push_back(text);
+                    }
+                }
+                break;
+            }
+            case estate_t::exit:
+            {
+                nodes.push_back(s.node);
+                break;
+            }
+            default:
             {
                 break;
             }
-            auto it = std::find_if(s.beg, s.end, [](char ch)
-            {
-                return ch == '/';
-            });
-            std::string name(s.beg, it);
-            for (auto attr = ((TiXmlElement*)s.node)->FirstAttribute(); attr != nullptr; attr = attr->Next())
-            {
-                if (::strcmp(attr->Name(), name.c_str()) == 0)
-                {
-                    nodes.push_back(attr);
-                    break;
-                }
-            }
-            break;
-        }
-        case estate_t::parent_or_current:
-        {
-            if (s.beg == s.end)
-            {
-                request_by_xpath_impl(State(estate_t::exit, s.beg, s.end, s.node), nodes);
-                break;
-            }
-            switch (*s.beg)
-            {
-                case '.':
-                {
-                    request_by_xpath_impl(State(estate_t::parent, s.beg + 1, s.end, s.node), nodes);
-                    break;
-                }
-                case '/':
-                {
-                    request_by_xpath_impl(State(estate_t::node, s.beg, s.end, s.node), nodes);
-                    break;
-                }
-            }
-            break;
-        }
-        case estate_t::text:
-        {
-            if (s.node->Type() != TiXmlNode::TINYXML_ELEMENT)
-            {
-                break;
-            }
-            for (auto child = s.node->FirstChild(); child != nullptr; child = child->NextSibling())
-            {
-                if (auto text = child->ToText())
-                {
-                    nodes.push_back(text);
-                }
-            }
-            break;
-        }
-        case estate_t::exit:
-        {
-            nodes.push_back(s.node);
-            break;
-        }
-        default:
-        {
-            break;
         }
     }
 }
