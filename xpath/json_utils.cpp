@@ -277,29 +277,32 @@ enum class estate_t
 };
 
 template<typename Iterator_t, typename Value_t>
-struct state_t
+struct State
 {
-    state_t(Iterator_t beg,
-            Iterator_t end,
-            Value_t* value,
-            estate_t state)
-        : beg(beg)
+    State(estate_t state,
+          Iterator_t beg,
+          Iterator_t end,
+          Value_t* value)
+        : state(state)
+        , beg(beg)
         , end(end)
         , value(value)
-        , state(state)
     {
     }
-    Iterator_t beg;
-    Iterator_t end;
-    Value_t* value;
-    estate_t   state;
+    estate_t    state;
+    Iterator_t  beg;
+    Iterator_t  end;
+    Value_t*    value;
 };
+
+//template<typename Iterator_t, typename Value_t>
+//State<Iterator_t, Value_t> ms(estate_t state, Iterator_t beg, Iterator_t end, Value)
 
 template<typename Iterator_t, typename Value_t>
 void request_by_jpath_impl(estate_t state,
                            Iterator_t beg,
                            Iterator_t end,
-                           Value_t& value,
+                           Value_t& rvalue,
                            std::vector<Value_t*>& values)
 {
     //
@@ -307,297 +310,224 @@ void request_by_jpath_impl(estate_t state,
     //
     using string_t = typename Value_t::String_type;
     using char_t   = typename string_t::value_type;
+    using state_t  = State<Iterator_t, Value_t>;
     //
-    // Finite automata.
+    // Variables.
     //
-    switch (state)
+    std::stack<state_t> states;
+    states.push(state_t(state, beg, end, &rvalue));
+    while (states.empty() == false)
     {
-        case estate_t::node:
+        auto s = states.top();
+        states.pop();
+        beg  = s.beg;
+        end  = s.end;
+        //
+        // Finite automata.
+        //
+        switch (s.state)
         {
-            //
-                    // Nothing after dot.
+            case estate_t::node:
+            {
+                //
+                // Nothing after dot.
+                //
+                if (beg == end)
+                {
+                    states.push(state_t(estate_t::exit, beg, end, s.value));
+                    break;
+                }
+                switch (widest(*beg))
+                {
                     //
-            if (beg == end)
-            {
-                request_by_jpath_impl(estate_t::exit,
-                                      beg,
-                                      end,
-                                      value,
-                                      values);
-                break;
-            }
-            switch (widest(*beg))
-            {
-                //
-                // Star as root.
-                //
-                case L'*':
-                {
-                    request_by_jpath_impl(estate_t::star,
-                                          beg + 1,
-                                          end,
-                                          value,
-                                          values);
-                    break;
-                }
-                //
-                // Dollar as rood.
-                //
-                case L'$':
-                {
-                    request_by_jpath_impl(estate_t::dot_or_sq,
-                                          beg + 1,
-                                          end,
-                                          value,
-                                          values);
-                    break;
-                }
-            }
-            break;
-        }
-        case estate_t::star:
-        {
-            switch (value.type())
-            {
-                case json_spirit::obj_type:
-                {
-                    for (auto& p : value.get_obj())
-                    {
-                        request_by_jpath_impl(estate_t::dot_or_sq,
-                                              beg,
-                                              end,
-                                              get_second(p),
-                                              values);
-                    }
-                    break;
-                }
-                case json_spirit::array_type:
-                {
-                    for (auto& v : value.get_array())
-                    {
-                        request_by_jpath_impl(estate_t::dot_or_sq,
-                                              beg,
-                                              end,
-                                              v,
-                                              values);
-                    }
-                    break;
-                }
-                default:
-                    break;
-            }
-            break;
-        }
-        case estate_t::dot_or_sq:
-        {
-            if (beg == end)
-            {
-                request_by_jpath_impl(estate_t::exit,
-                                      beg,
-                                      end,
-                                      value,
-                                      values);
-                break;
-            }
-            switch (widest(*beg))
-            {
-                case L'.':
-                {
-                    ++beg;
+                    // Star as root.
                     //
-                    // Nothing after dot.
-                    //
-                    if (beg == end)
+                    case L'*':
                     {
-                        request_by_jpath_impl(estate_t::exit,
-                                              beg,
-                                              end,
-                                              value,
-                                              values);
+                        states.push(state_t(estate_t::star, beg + 1, end, s.value));
                         break;
                     }
                     //
-                    // There is some symbol after dot, let's analize it.
+                    // Dollar as rood.
                     //
-                    switch (widest(*beg))
+                    case L'$':
                     {
-                        //
-                        // It's second dot.
-                        //
-                        case L'.':
-                        {
-                            request_by_jpath_impl(estate_t::second_dot,
-                                                  beg + 1,
-                                                  end,
-                                                  value,
-                                                  values);
-                            break;
-                        }
-                        case L'[':
-                        {
-                            request_by_jpath_impl(estate_t::sq_brackets,
-                                                  beg + 1,
-                                                  end,
-                                                  value,
-                                                  values);
-                            break;
-                        }
-                        case L'*':
-                        {
-                            request_by_jpath_impl(estate_t::star,
-                                                  beg + 1,
-                                                  end,
-                                                  value,
-                                                  values);
-                            break;
-                        }
-                        case L'$':
-                        {
-                            request_by_jpath_impl(estate_t::node,
-                                                  beg,
-                                                  end,
-                                                  value,
-                                                  values);
-                            break;
-                        }
-                        default:
-                        {
-                            request_by_jpath_impl(estate_t::field_name,
-                                                  beg,
-                                                  end,
-                                                  value,
-                                                  values);
-                            break;
-                        }
-                    }
-                    break;
-                }
-                case L'[':
-                {
-                    request_by_jpath_impl(estate_t::sq_brackets,
-                                          beg + 1,
-                                          end,
-                                          value,
-                                          values);
-                    break;
-                }
-                default:
-                    break;
-            }
-            break;
-        }
-        case estate_t::sq_brackets:
-        {
-            //
-            // Nothing after open square brackets.
-            //
-            if (beg == end)
-            {
-                break;
-            }
-            switch (widest(*beg))
-            {
-                //
-                // Seems we are dealing with an object.
-                //
-                case L'"':
-                {
-                    request_by_jpath_impl(estate_t::str_index,
-                                          beg + 1,
-                                          end,
-                                          value,
-                                          values);
-                    break;
-                }
-                case L'(':
-                {
-                    request_by_jpath_impl(estate_t::expression,
-                                          beg + 1,
-                                          end,
-                                          value,
-                                          values);
-                    break;
-                }
-                case L'?':
-                {
-                    request_by_jpath_impl(estate_t::filter,
-                                          beg + 1,
-                                          end,
-                                          value,
-                                          values);
-                    break;
-                }
-                //
-                // All fields or array elements. It's equivalent to .* syntax.
-                //
-                case L'*':
-                {
-                    ++beg;
-                    if (beg == end || *beg != static_cast<char_t>(']'))
-                    {
+                        states.push(state_t(estate_t::dot_or_sq, beg + 1, end, s.value));
                         break;
                     }
-                    request_by_jpath_impl(estate_t::star,
-                                          beg + 1,
-                                          end,
-                                          value,
-                                          values);
-                    break;
                 }
-                //
-                // Seems we are dealing here with arrays.
-                //
-                default:
+                break;
+            }
+            case estate_t::star:
+            {
+                switch (s.value->type())
                 {
-                    request_by_jpath_impl(estate_t::int_index,
-                                          beg,
-                                          end,
-                                          value,
-                                          values);
+                    case json_spirit::obj_type:
+                    {
+                        std::for_each(s.value->get_obj().rbegin(),
+                                      s.value->get_obj().rend(),
+                                      [&states, beg, end](auto& p)
+                        {
+                            states.push(state_t(estate_t::dot_or_sq, beg, end, &get_second(p)));
+                        });
+                        break;
+                    }
+                    case json_spirit::array_type:
+                    {
+                        std::for_each(s.value->get_array().rbegin(),
+                                      s.value->get_array().rend(),
+                                      [&states, beg, end](auto& v)
+                        {
+                            states.push(state_t(estate_t::dot_or_sq, beg, end, &v));
+                        });
+                        break;
+                    }
+                    default:
+                        break;
+                }
+                break;
+            }
+            case estate_t::dot_or_sq:
+            {
+                if (beg == end)
+                {
+                    states.push(state_t(estate_t::exit, beg, end, s.value));
                     break;
                 }
+                switch (widest(*beg))
+                {
+                    case L'.':
+                    {
+                        ++beg;
+                        //
+                        // Nothing after dot.
+                        //
+                        if (beg == end)
+                        {
+                            states.push(state_t(estate_t::exit, beg, end, s.value));
+                            break;
+                        }
+                        //
+                        // There is some symbol after dot, let's analize it.
+                        //
+                        switch (widest(*beg))
+                        {
+                            //
+                            // It's second dot.
+                            //
+                            case L'.':
+                            {
+                                states.push(state_t(estate_t::second_dot, beg + 1, end, s.value));
+                                break;
+                            }
+                            case L'[':
+                            {
+                                states.push(state_t(estate_t::sq_brackets, beg + 1, end, s.value));
+                                break;
+                            }
+                            case L'*':
+                            {
+                                states.push(state_t(estate_t::star, beg + 1, end, s.value));
+                                break;
+                            }
+                            case L'$':
+                            {
+                                states.push(state_t(estate_t::node, beg, end, s.value));
+                                break;
+                            }
+                            default:
+                            {
+                                states.push(state_t(estate_t::field_name, beg, end, s.value));
+                                break;
+                            }
+                        }
+                        break;
+                    }
+                    case L'[':
+                    {
+                        states.push(state_t(estate_t::sq_brackets, beg + 1, end, s.value));
+                        break;
+                    }
+                    default:
+                        break;
+                }
+                break;
             }
-            break;
-        }
-        case estate_t::second_dot:
-        {
-            break;
-        }
-        case estate_t::expression:
-        {
-            break;
-        }
-        case estate_t::filter:
-        {
-            break;
-        }
-        case estate_t::int_index:
-        {
-            if (value.type() != json_spirit::array_type)
+            case estate_t::sq_brackets:
+            {
+                //
+                // Nothing after open square brackets.
+                //
+                if (beg == end)
+                {
+                    break;
+                }
+                switch (widest(*beg))
+                {
+                    //
+                    // Seems we are dealing with an object.
+                    //
+                    case L'"':
+                    {
+                        states.push(state_t(estate_t::str_index, beg + 1, end, s.value));
+                        break;
+                    }
+                    case L'(':
+                    {
+                        states.push(state_t(estate_t::expression, beg + 1, end, s.value));
+                        break;
+                    }
+                    case L'?':
+                    {
+                        states.push(state_t(estate_t::filter, beg + 1, end, s.value));
+                        break;
+                    }
+                    //
+                    // All fields or array elements. It's equivalent to .* syntax.
+                    //
+                    case L'*':
+                    {
+                        ++beg;
+                        if (beg == end || *beg != static_cast<char_t>(']'))
+                        {
+                            break;
+                        }
+                        states.push(state_t(estate_t::star, beg + 1, end, s.value));
+                        break;
+                    }
+                    //
+                    // Seems we are dealing here with arrays.
+                    //
+                    default:
+                    {
+                        states.push(state_t(estate_t::int_index, beg, end, s.value));
+                        break;
+                    }
+                }
+                break;
+            }
+            case estate_t::second_dot:
             {
                 break;
             }
-            //
-            // Start index.
-            //
-            auto it = std::find_if(beg, end, [](char_t ch)
-            {
-                return ch < static_cast<char_t>('0') || static_cast<char_t>('9') < ch;
-            });
-            if (it == beg || it == end || (*it != static_cast<char_t>(']') && *it != static_cast<char_t>(':')))
+            case estate_t::expression:
             {
                 break;
             }
-            auto start_index = static_cast<size_t>(std::stoul(string_t(beg, it)));
-            auto end_index   = start_index + 1;
-            auto step        = 1;
-            if (*it == static_cast<char_t>(':'))
+            case estate_t::filter:
             {
+                break;
+            }
+            case estate_t::int_index:
+            {
+                if (s.value->type() != json_spirit::array_type)
+                {
+                    break;
+                }
                 //
-                // End index. 
+                // Start index.
                 //
-                beg = ++it;
-                it = std::find_if(beg, end, [](char_t ch)
+                auto it = std::find_if(beg, end, [](char_t ch)
                 {
                     return ch < static_cast<char_t>('0') || static_cast<char_t>('9') < ch;
                 });
@@ -605,157 +535,166 @@ void request_by_jpath_impl(estate_t state,
                 {
                     break;
                 }
-                end_index = std::stoul(string_t(beg, it));
-                if (*it == static_cast<char>(':'))
+                auto start_index = static_cast<size_t>(std::stoul(string_t(beg, it)));
+                auto end_index = start_index + 1;
+                auto step = 1;
+                if (*it == static_cast<char_t>(':'))
                 {
                     //
-                    // Step. 
+                    // End index. 
                     //
                     beg = ++it;
                     it = std::find_if(beg, end, [](char_t ch)
                     {
                         return ch < static_cast<char_t>('0') || static_cast<char_t>('9') < ch;
                     });
-                    if (it == beg || it == end || *it != static_cast<char_t>(']'))
+                    if (it == beg || it == end || (*it != static_cast<char_t>(']') && *it != static_cast<char_t>(':')))
                     {
                         break;
                     }
-                    step = std::stoul(string_t(beg, it));
+                    end_index = std::stoul(string_t(beg, it));
+                    if (*it == static_cast<char>(':'))
+                    {
+                        //
+                        // Step. 
+                        //
+                        beg = ++it;
+                        it = std::find_if(beg, end, [](char_t ch)
+                        {
+                            return ch < static_cast<char_t>('0') || static_cast<char_t>('9') < ch;
+                        });
+                        if (it == beg || it == end || *it != static_cast<char_t>(']'))
+                        {
+                            break;
+                        }
+                        step = std::stoul(string_t(beg, it));
+                    }
                 }
-            }
-            auto& array = value.get_array();
-            if (array.size() <= start_index)
-            {
-                break;
-            }
-            for (auto index = start_index; index < std::min(end_index, array.size()); index += step)
-            {
-                request_by_jpath_impl(estate_t::dot_or_sq,
-                                      it + 1,
-                                      end,
-                                      array[index],
-                                      values);
-            }
-            break;
-        }
-        case estate_t::str_index:
-        {
-            //
-                    // We are dealing here only with objects.
-                    //
-            if (value.type() != json_spirit::obj_type)
-            {
-                break;
-            }
-            string_t name;
-            //
-            // Looking for closing '"' symbol.
-            //
-            char_t previous_ch = static_cast<char_t>('\0');
-            auto it = std::find_if(beg, end, [&previous_ch, &name](char_t ch)
-            {
-                switch (widest(ch))
+                auto& array = s.value->get_array();
+                if (array.size() <= start_index)
                 {
-                    case L'"':
-                        switch (widest(previous_ch))
-                        {
-                            case L'\\':
-                                previous_ch = '\0';
-                                name.push_back(ch);
-                                return false;
-                            default:
-                                return true;
-                        }
-                        break;
-                    case L'\\':
-                        switch (widest(previous_ch))
-                        {
-                            case L'\\':
-                                previous_ch = '\0';
-                                name.push_back(ch);
-                                return false;
-                            default:
-                                previous_ch = '\\';
-                                return false;
-                        }
-                        break;
-                    default:
-                        name.push_back(ch);
-                        return false;
+                    break;
                 }
-            });
-            //
-            // If '"' wasn't found or if it goes right after opening one, like this "".
-            //
-            if (it == beg || it == end || *it != static_cast<char_t>('"'))
-            {
+                end_index = std::min(end_index, array.size());
+                for (auto index = start_index + step * ((end_index - start_index) / step);
+                     index != start_index;
+                     index -= step)
+                {
+                    states.push(state_t(estate_t::dot_or_sq, it + 1, end, &array[index - step]));
+                }
                 break;
             }
-            //
-            // Let's check if we have closing square bracket.
-            //
-            if (++it == end || *it != static_cast<char_t>(']'))
+            case estate_t::str_index:
             {
+                //
+                        // We are dealing here only with objects.
+                        //
+                if (s.value->type() != json_spirit::obj_type)
+                {
+                    break;
+                }
+                string_t name;
+                //
+                // Looking for closing '"' symbol.
+                //
+                char_t previous_ch = static_cast<char_t>('\0');
+                auto it = std::find_if(beg, end, [&previous_ch, &name](char_t ch)
+                {
+                    switch (widest(ch))
+                    {
+                        case L'"':
+                            switch (widest(previous_ch))
+                            {
+                                case L'\\':
+                                    previous_ch = '\0';
+                                    name.push_back(ch);
+                                    return false;
+                                default:
+                                    return true;
+                            }
+                            break;
+                        case L'\\':
+                            switch (widest(previous_ch))
+                            {
+                                case L'\\':
+                                    previous_ch = '\0';
+                                    name.push_back(ch);
+                                    return false;
+                                default:
+                                    previous_ch = '\\';
+                                    return false;
+                            }
+                            break;
+                        default:
+                            name.push_back(ch);
+                            return false;
+                    }
+                });
+                //
+                // If '"' wasn't found or if it goes right after opening one, like this "".
+                //
+                if (it == beg || it == end || *it != static_cast<char_t>('"'))
+                {
+                    break;
+                }
+                //
+                // Let's check if we have closing square bracket.
+                //
+                if (++it == end || *it != static_cast<char_t>(']'))
+                {
+                    break;
+                }
+                //
+                // Looking for child value.
+                //
+                auto& obj = s.value->get_obj();
+                auto child_it = find_field(name, obj);
+                if (child_it == obj.end())
+                {
+                    break;
+                }
+                states.push(state_t(estate_t::dot_or_sq, it + 1, end, &get_second(*child_it)));
                 break;
             }
-            //
-            // Looking for child value.
-            //
-            auto& obj = value.get_obj();
-            auto child_it = find_field(name, obj);
-            if (child_it == obj.end())
+            case estate_t::field_name:
             {
+                //
+                                // It works only for objects.
+                                //
+                if (s.value->type() != json_spirit::obj_type)
+                {
+                    break;
+                }
+                //
+                // Creating field name.
+                //
+                auto it = std::find_if(beg, end, [](char_t ch)
+                {
+                    return ch == static_cast<char_t>('.') || ch == static_cast<char_t>('[');
+                });
+                string_t name(beg, it);
+                //
+                // Looking for field by name.
+                //
+                auto obj_it = find_field(name, s.value->get_obj());
+                if (obj_it == s.value->get_obj().end())
+                {
+                    break;
+                }
+                //
+                // Requesting for found by name value.
+                //
+                states.push(state_t(estate_t::dot_or_sq, it, end, &get_second(*obj_it)));
                 break;
             }
-            request_by_jpath_impl(estate_t::dot_or_sq,
-                                  it + 1,
-                                  end,
-                                  get_second(*child_it),
-                                  values);
-            break;
+            case estate_t::exit:
+            {
+                values.push_back(s.value);
+                break;
+            }
+            default:
+                break;
         }
-        case estate_t::field_name:
-        {
-            //
-                            // It works only for objects.
-                            //
-            if (value.type() != json_spirit::obj_type)
-            {
-                break;
-            }
-            //
-            // Creating field name.
-            //
-            auto it = std::find_if(beg, end, [](char_t ch)
-            {
-                return ch == static_cast<char_t>('.') || ch == static_cast<char_t>('[');
-            });
-            string_t name(beg, it);
-            //
-            // Looking for field by name.
-            //
-            auto obj_it = find_field(name, value.get_obj());
-            if (obj_it == value.get_obj().end())
-            {
-                break;
-            }
-            //
-            // Requesting for found by name value.
-            //
-            request_by_jpath_impl(estate_t::dot_or_sq,
-                                  it,
-                                  end,
-                                  get_second(*obj_it),
-                                  values);
-            break;
-        }
-        case estate_t::exit:
-        {
-            values.push_back(&value);
-            break;
-        }
-        default:
-            break;
     }
 }
 
