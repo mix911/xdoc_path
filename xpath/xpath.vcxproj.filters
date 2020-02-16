@@ -20,21 +20,21 @@
     <ClCompile Include="test_request_by_jpath.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="xml_utils.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="test_request_by_xpath.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="jspirit_path.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="xtiny_path.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="xml_utils.h">
+    <ClInclude Include="jspirit_path.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="jspirit_path.h">
+    <ClInclude Include="xtiny_path.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

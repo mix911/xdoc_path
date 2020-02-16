@@ -163,11 +163,11 @@
     <ClCompile Include="test_get_value.cpp" />
     <ClCompile Include="test_request_by_jpath.cpp" />
     <ClCompile Include="test_request_by_xpath.cpp" />
-    <ClCompile Include="xml_utils.cpp" />
+    <ClCompile Include="xtiny_path.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="jspirit_path.h" />
-    <ClInclude Include="xml_utils.h" />
+    <ClInclude Include="xtiny_path.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
