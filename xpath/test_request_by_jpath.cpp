@@ -1,4 +1,4 @@
-#include "json_utils.h"
+#include "jspirit_path.h"
 #include <gtest/gtest.h>
 
 template<typename Result_t>

@@ -158,7 +158,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="json_utils.cpp" />
+    <ClCompile Include="jspirit_path.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="test_get_value.cpp" />
     <ClCompile Include="test_request_by_jpath.cpp" />
@@ -166,7 +166,7 @@
     <ClCompile Include="xml_utils.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="json_utils.h" />
+    <ClInclude Include="jspirit_path.h" />
     <ClInclude Include="xml_utils.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
