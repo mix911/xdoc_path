@@ -1,6 +1,8 @@
 #include "jspirit_path.h"
 #include <gtest/gtest.h>
 
+using namespace th::json;
+
 template<typename Result_t>
 Result_t make_json(const std::string& s)
 {

@@ -4,6 +4,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 VisualStudioVersion = 16.0.29709.97
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "xpath", "xpath\xpath.vcxproj", "{F3C8855C-7ECF-40FE-AF6D-B41C749166F8}"
+	ProjectSection(ProjectDependencies) = postProject
+		{5805C87F-B61B-4B80-A404-B2F4B70E427A} = {5805C87F-B61B-4B80-A404-B2F4B70E427A}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "xdoc_path", "xdoc_path\xdoc_path.vcxproj", "{5805C87F-B61B-4B80-A404-B2F4B70E427A}"
 EndProject

@@ -3,6 +3,7 @@
 #include <gtest/gtest.h>
 
 using namespace std;
+using namespace th::json;
 
 template<typename Result_t>
 Result_t make_json(const std::string& s)
