@@ -2,7 +2,7 @@
 
 #include <algorithm>
 #include <type_traits>
-#include <stack>
+#include <queue>
 
 inline json_spirit::Object::iterator find_field(const std::string& n, json_spirit::Object& o)
 {
@@ -314,11 +314,11 @@ void request_by_jpath_impl(estate_t state,
     //
     // Variables.
     //
-    std::stack<state_t> states;
+    std::queue<state_t> states;
     states.push(state_t(state, beg, end, &rvalue));
     while (states.empty() == false)
     {
-        auto s = states.top();
+        auto s = states.front();
         states.pop();
         beg  = s.beg;
         end  = s.end;
@@ -364,22 +364,18 @@ void request_by_jpath_impl(estate_t state,
                 {
                     case json_spirit::obj_type:
                     {
-                        std::for_each(s.value->get_obj().rbegin(),
-                                      s.value->get_obj().rend(),
-                                      [&states, beg, end](auto& p)
+                        for (auto& p : s.value->get_obj())
                         {
                             states.push(state_t(estate_t::dot_or_sq, beg, end, &get_second(p)));
-                        });
+                        }
                         break;
                     }
                     case json_spirit::array_type:
                     {
-                        std::for_each(s.value->get_array().rbegin(),
-                                      s.value->get_array().rend(),
-                                      [&states, beg, end](auto& v)
+                        for (auto& v : s.value->get_array())
                         {
                             states.push(state_t(estate_t::dot_or_sq, beg, end, &v));
-                        });
+                        }
                         break;
                     }
                     default:
@@ -576,11 +572,9 @@ void request_by_jpath_impl(estate_t state,
                     break;
                 }
                 end_index = std::min(end_index, array.size());
-                for (auto index = start_index + step * ((end_index - start_index) / step);
-                     index != start_index;
-                     index -= step)
+                for (auto index = start_index; index < end_index; index += step)
                 {
-                    states.push(state_t(estate_t::dot_or_sq, it + 1, end, &array[index - step]));
+                    states.push(state_t(estate_t::dot_or_sq, it + 1, end, &array[index]));
                 }
                 break;
             }
