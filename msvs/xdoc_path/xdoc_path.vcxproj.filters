@@ -11,18 +11,18 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="jspirit_path.cpp">
+    <ClCompile Include="..\..\src\xdoc_path\jspirit_path.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="xtiny_path.cpp">
+    <ClCompile Include="..\..\src\xdoc_path\xtiny_path.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="jspirit_path.h">
+    <ClInclude Include="..\..\src\xdoc_path\jspirit_path.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="xtiny_path.h">
+    <ClInclude Include="..\..\src\xdoc_path\xtiny_path.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

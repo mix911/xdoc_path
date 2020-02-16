@@ -18,6 +18,12 @@
       <Platform>x64</Platform>
     </ProjectConfiguration>
   </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\src\tests\main.cpp" />
+    <ClCompile Include="..\..\src\tests\test_get_value.cpp" />
+    <ClCompile Include="..\..\src\tests\test_request_by_jpath.cpp" />
+    <ClCompile Include="..\..\src\tests\test_request_by_xpath.cpp" />
+  </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
     <ProjectGuid>{F3C8855C-7ECF-40FE-AF6D-B41C749166F8}</ProjectGuid>
@@ -91,7 +97,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(Shared)json_spirit;$(shared)MSVC2019\UPG\Externals\gtestlib\gtestlib\include;$(shared)MSVC2019\UPG\Externals\boost\$(Configuration)-$(Platform)\include\boost-1_72;$(shared)MSVC2019\UPG\Externals\tinyxml\;$(SolutionDir)xdoc_path;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(Shared)json_spirit;$(shared)MSVC2019\UPG\Externals\gtestlib\gtestlib\include;$(shared)MSVC2019\UPG\Externals\boost\$(Configuration)-$(Platform)\include\boost-1_72;$(shared)MSVC2019\UPG\Externals\tinyxml\;$(SolutionDir)..\src\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
     </ClCompile>
     <Link>
@@ -107,7 +113,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(Shared)json_spirit;$(shared)MSVC2019\UPG\Externals\gtestlib\gtestlib\include;$(shared)MSVC2019\UPG\Externals\boost\$(Configuration)-$(Platform)\include\boost-1_72;$(shared)MSVC2019\UPG\Externals\tinyxml\;$(SolutionDir)xdoc_path;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(Shared)json_spirit;$(shared)MSVC2019\UPG\Externals\gtestlib\gtestlib\include;$(shared)MSVC2019\UPG\Externals\boost\$(Configuration)-$(Platform)\include\boost-1_72;$(shared)MSVC2019\UPG\Externals\tinyxml\;$(SolutionDir)..\src\;$(SolutionDir)xdoc_path;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
     </ClCompile>
     <Link>
@@ -125,7 +131,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(Shared)json_spirit;$(shared)MSVC2019\UPG\Externals\gtestlib\gtestlib\include;$(shared)MSVC2019\UPG\Externals\boost\$(Configuration)-$(Platform)\include\boost-1_72;$(shared)MSVC2019\UPG\Externals\tinyxml\;$(SolutionDir)xdoc_path;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(Shared)json_spirit;$(shared)MSVC2019\UPG\Externals\gtestlib\gtestlib\include;$(shared)MSVC2019\UPG\Externals\boost\$(Configuration)-$(Platform)\include\boost-1_72;$(shared)MSVC2019\UPG\Externals\tinyxml\;$(SolutionDir)..\src\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
     </ClCompile>
     <Link>
@@ -145,7 +151,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(Shared)json_spirit;$(shared)MSVC2019\UPG\Externals\gtestlib\gtestlib\include;$(shared)MSVC2019\UPG\Externals\boost\$(Configuration)-$(Platform)\include\boost-1_72;$(shared)MSVC2019\UPG\Externals\tinyxml\;$(SolutionDir)xdoc_path;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(Shared)json_spirit;$(shared)MSVC2019\UPG\Externals\gtestlib\gtestlib\include;$(shared)MSVC2019\UPG\Externals\boost\$(Configuration)-$(Platform)\include\boost-1_72;$(shared)MSVC2019\UPG\Externals\tinyxml\;$(SolutionDir)..\src\;$(SolutionDir)xdoc_path;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
     </ClCompile>
     <Link>
@@ -157,12 +163,6 @@
       <AdditionalDependencies>gtestlib.lib;json_spirit_lib.lib;tinyxml.lib;xdoc_path.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
-  <ItemGroup>
-    <ClCompile Include="main.cpp" />
-    <ClCompile Include="test_get_value.cpp" />
-    <ClCompile Include="test_request_by_jpath.cpp" />
-    <ClCompile Include="test_request_by_xpath.cpp" />
-  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

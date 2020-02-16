@@ -11,16 +11,16 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="main.cpp">
+    <ClCompile Include="..\..\src\tests\main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="test_get_value.cpp">
+    <ClCompile Include="..\..\src\tests\test_get_value.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="test_request_by_jpath.cpp">
+    <ClCompile Include="..\..\src\tests\test_request_by_jpath.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="test_request_by_xpath.cpp">
+    <ClCompile Include="..\..\src\tests\test_request_by_xpath.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
