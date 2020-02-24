@@ -97,13 +97,13 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(Shared)json_spirit;$(shared)MSVC2019\UPG\Externals\gtestlib\gtestlib\include;$(shared)MSVC2019\UPG\Externals\boost\$(Configuration)-$(Platform)\include\boost-1_72;$(shared)MSVC2019\UPG\Externals\tinyxml\;$(SolutionDir)..\src\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(Shared)json_spirit;$(shared)MSVC2019\UPG\Externals_2019\gtestlib\gtestlib\include;$(shared)MSVC2019\UPG\Externals_2019\boost\$(Configuration)-$(Platform)\include\boost-1_72;$(shared)MSVC2019\UPG\Externals_2019\tinyxml\;$(SolutionDir)..\src\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>$(shared)json_spirit\$(Platform)\$(Configuration);$(Shared)MSVC2019\UPG\Externals\gtestlib\$(Platform)\$(Configuration);$(Shared)MSVC2019\UPG\Externals\boost\$(Configuration)-$(Platform)\lib\;$(shared)MSVC2019\UPG\Externals\tinyxml\$(Platform)\$(Configuration)\;$(SolutionDir)$(Platform)\$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(shared)json_spirit\$(Platform)\$(Configuration);$(Shared)MSVC2019\UPG\Externals_2019\gtestlib\$(Platform)\$(Configuration);$(Shared)MSVC2019\UPG\Externals_2019\boost\$(Configuration)-$(Platform)\lib\;$(shared)MSVC2019\UPG\Externals_2019\tinyxml\$(Platform)\$(Configuration)\;$(SolutionDir)$(Platform)\$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>gtestlib.lib;json_spirit_lib.lib;tinyxml.lib;xdoc_path.lib;json_spirit_lib.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
@@ -113,13 +113,13 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(Shared)json_spirit;$(shared)MSVC2019\UPG\Externals\gtestlib\gtestlib\include;$(shared)MSVC2019\UPG\Externals\boost\$(Configuration)-$(Platform)\include\boost-1_72;$(shared)MSVC2019\UPG\Externals\tinyxml\;$(SolutionDir)..\src\;$(SolutionDir)xdoc_path;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(Shared)json_spirit;$(shared)MSVC2019\UPG\Externals_2019\gtestlib\gtestlib\include;$(shared)MSVC2019\UPG\Externals_2019\boost\$(Configuration)-$(Platform)\include\boost-1_72;$(shared)MSVC2019\UPG\Externals_2019\tinyxml\;$(SolutionDir)..\src\;$(SolutionDir)xdoc_path;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>$(shared)json_spirit\$(Platform)\$(Configuration);$(Shared)MSVC2019\UPG\Externals\gtestlib\$(Platform)\$(Configuration);$(Shared)MSVC2019\UPG\Externals\boost\$(Configuration)-$(Platform)\lib\;$(shared)MSVC2019\UPG\Externals\tinyxml\$(Platform)\$(Configuration)\;$(SolutionDir)$(Platform)\$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(shared)json_spirit\$(Platform)\$(Configuration);$(Shared)MSVC2019\UPG\Externals_2019\gtestlib\$(Platform)\$(Configuration);$(Shared)MSVC2019\UPG\Externals_2019\boost\$(Configuration)-$(Platform)\lib\;$(shared)MSVC2019\UPG\Externals_2019\tinyxml\$(Platform)\$(Configuration)\;$(SolutionDir)$(Platform)\$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>gtestlib.lib;json_spirit_lib.lib;tinyxml.lib;xdoc_path.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
@@ -131,7 +131,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(Shared)json_spirit;$(shared)MSVC2019\UPG\Externals\gtestlib\gtestlib\include;$(shared)MSVC2019\UPG\Externals\boost\$(Configuration)-$(Platform)\include\boost-1_72;$(shared)MSVC2019\UPG\Externals\tinyxml\;$(SolutionDir)..\src\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(Shared)json_spirit;$(shared)MSVC2019\UPG\Externals_2019\gtestlib\gtestlib\include;$(shared)MSVC2019\UPG\Externals_2019\boost\$(Configuration)-$(Platform)\include\boost-1_72;$(shared)MSVC2019\UPG\Externals_2019\tinyxml\;$(SolutionDir)..\src\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
     </ClCompile>
     <Link>
@@ -139,7 +139,7 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>$(shared)json_spirit\$(Platform)\$(Configuration);$(Shared)MSVC2019\UPG\Externals\gtestlib\$(Platform)\$(Configuration);$(Shared)MSVC2019\UPG\Externals\boost\$(Configuration)-$(Platform)\lib\;$(shared)MSVC2019\UPG\Externals\tinyxml\$(Platform)\$(Configuration)\;$(SolutionDir)$(Platform)\$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(shared)json_spirit\$(Platform)\$(Configuration);$(Shared)MSVC2019\UPG\Externals_2019\gtestlib\$(Platform)\$(Configuration);$(Shared)MSVC2019\UPG\Externals_2019\boost\$(Configuration)-$(Platform)\lib\;$(shared)MSVC2019\UPG\Externals_2019\tinyxml\$(Platform)\$(Configuration)\;$(SolutionDir)$(Platform)\$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>gtestlib.lib;json_spirit_lib.lib;tinyxml.lib;xdoc_path.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
@@ -151,7 +151,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(Shared)json_spirit;$(shared)MSVC2019\UPG\Externals\gtestlib\gtestlib\include;$(shared)MSVC2019\UPG\Externals\boost\$(Configuration)-$(Platform)\include\boost-1_72;$(shared)MSVC2019\UPG\Externals\tinyxml\;$(SolutionDir)..\src\;$(SolutionDir)xdoc_path;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(Shared)json_spirit;$(shared)MSVC2019\UPG\Externals_2019\gtestlib\gtestlib\include;$(shared)MSVC2019\UPG\Externals_2019\boost\$(Configuration)-$(Platform)\include\boost-1_72;$(shared)MSVC2019\UPG\Externals_2019\tinyxml\;$(SolutionDir)..\src\;$(SolutionDir)xdoc_path;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
     </ClCompile>
     <Link>
@@ -159,7 +159,7 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>$(shared)json_spirit\$(Platform)\$(Configuration);$(Shared)MSVC2019\UPG\Externals\gtestlib\$(Platform)\$(Configuration);$(Shared)MSVC2019\UPG\Externals\boost\$(Configuration)-$(Platform)\lib\;$(shared)MSVC2019\UPG\Externals\tinyxml\$(Platform)\$(Configuration)\;$(SolutionDir)$(Platform)\$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(shared)json_spirit\$(Platform)\$(Configuration);$(Shared)MSVC2019\UPG\Externals_2019\gtestlib\$(Platform)\$(Configuration);$(Shared)MSVC2019\UPG\Externals_2019\boost\$(Configuration)-$(Platform)\lib\;$(shared)MSVC2019\UPG\Externals_2019\tinyxml\$(Platform)\$(Configuration)\;$(SolutionDir)$(Platform)\$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>gtestlib.lib;json_spirit_lib.lib;tinyxml.lib;xdoc_path.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>

@@ -102,7 +102,7 @@
       <PreprocessorDefinitions>_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>$(Shared)json_spirit;$(shared)MSVC2019\UPG\Externals\gtestlib\gtestlib\include;$(shared)MSVC2019\UPG\Externals\boost\$(Configuration)-$(Platform)\include\boost-1_72;$(shared)MSVC2019\UPG\Externals\tinyxml\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(Shared)json_spirit;$(shared)MSVC2019\UPG\Externals_2019\gtestlib\gtestlib\include;$(shared)MSVC2019\UPG\Externals_2019\boost\$(Configuration)-$(Platform)\include\boost-1_72;$(shared)MSVC2019\UPG\Externals_2019\tinyxml\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
     </ClCompile>
     <Link>
@@ -118,7 +118,7 @@
       <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>$(Shared)json_spirit;$(shared)MSVC2019\UPG\Externals\gtestlib\gtestlib\include;$(shared)MSVC2019\UPG\Externals\boost\$(Configuration)-$(Platform)\include\boost-1_72;$(shared)MSVC2019\UPG\Externals\tinyxml\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(Shared)json_spirit;$(shared)MSVC2019\UPG\Externals_2019\gtestlib\gtestlib\include;$(shared)MSVC2019\UPG\Externals_2019\boost\$(Configuration)-$(Platform)\include\boost-1_72;$(shared)MSVC2019\UPG\Externals_2019\tinyxml\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
     </ClCompile>
     <Link>
@@ -136,7 +136,7 @@
       <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>$(Shared)json_spirit;$(shared)MSVC2019\UPG\Externals\gtestlib\gtestlib\include;$(shared)MSVC2019\UPG\Externals\boost\$(Configuration)-$(Platform)\include\boost-1_72;$(shared)MSVC2019\UPG\Externals\tinyxml\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(Shared)json_spirit;$(shared)MSVC2019\UPG\Externals_2019\gtestlib\gtestlib\include;$(shared)MSVC2019\UPG\Externals_2019\boost\$(Configuration)-$(Platform)\include\boost-1_72;$(shared)MSVC2019\UPG\Externals_2019\tinyxml\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
     </ClCompile>
     <Link>
@@ -156,7 +156,7 @@
       <PreprocessorDefinitions>NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>$(Shared)json_spirit;$(shared)MSVC2019\UPG\Externals\gtestlib\gtestlib\include;$(shared)MSVC2019\UPG\Externals\boost\$(Configuration)-$(Platform)\include\boost-1_72;$(shared)MSVC2019\UPG\Externals\tinyxml\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(Shared)json_spirit;$(shared)MSVC2019\UPG\Externals_2019\gtestlib\gtestlib\include;$(shared)MSVC2019\UPG\Externals_2019\boost\$(Configuration)-$(Platform)\include\boost-1_72;$(shared)MSVC2019\UPG\Externals_2019\tinyxml\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
     </ClCompile>
     <Link>
