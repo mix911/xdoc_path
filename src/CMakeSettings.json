@@ -5,7 +5,7 @@
       "generator": "Ninja",
       "configurationType": "Debug",
       "inheritEnvironments": [ "msvc_x64_x64" ],
-      "buildRoot": "${projectDir}\\out\\build\\debug-${name}",
+      "buildRoot": "${projectDir}\\out\\build\\debug-x64-${name}",
       "installRoot": "${projectDir}\\out\\install\\${name}",
       "cmakeCommandArgs": "-DCMAKE_CXX_FLAGS_RELEASE=\"/MT\" -DCMAKE_CXX_FLAGS_DEBUG=\"/MTd\" -DBoost_INCLUDE_DIR=D:\\work\\shared\\MSVC2019\\UPG\\Externals_2019\\boost\\Debug-x64\\include\\boost-1_72 -DJSON_SPIRIT_INCLUDE_DIR=D:\\work\\shared\\json_spirit -DTINY_XML_INCLUDE_DIR=D:\\work\\shared\\MSVC2019\\UPG\\Externals_2019\\tinyxml -DGTEST_INCLUDE_DIR=D:\\work\\shared\\MSVC2019\\UPG\\Externals_2019\\gtestlib\\gtestlib\\include -DJSON_SPIRIT_LIB_DIR=D:\\work\\shared\\json_spirit\\x64\\Debug -DBOOST_LIB_DIR=D:\\work\\shared\\MSVC2019\\UPG\\Externals_2019\\boost\\Debug-x64\\lib  -DGTEST_LIB_DIR=D:\\work\\shared\\MSVC2019\\UPG\\Externals_2019\\gtestlib\\x64\\Debug -DTINY_XML_LIB_DIR=D:\\work\\shared\\MSVC2019\\UPG\\Externals_2019\\tinyxml\\x64\\Debug",
       "buildCommandArgs": "-v",
@@ -16,12 +16,36 @@
       "name": "x64-Release",
       "generator": "Ninja",
       "configurationType": "Release",
-      "buildRoot": "${projectDir}\\out\\build\\release-${name}",
+      "buildRoot": "${projectDir}\\out\\build\\release-x64-${name}",
       "installRoot": "${projectDir}\\out\\install\\${name}",
       "cmakeCommandArgs": "-DCMAKE_CXX_FLAGS_RELEASE=\"/MT\" -DBoost_INCLUDE_DIR=D:\\work\\shared\\MSVC2019\\UPG\\Externals_2019\\boost\\Release-x64\\include\\boost-1_72 -DJSON_SPIRIT_INCLUDE_DIR=D:\\work\\shared\\json_spirit -DTINY_XML_INCLUDE_DIR=D:\\work\\shared\\MSVC2019\\UPG\\Externals_2019\\tinyxml -DGTEST_INCLUDE_DIR=D:\\work\\shared\\MSVC2019\\UPG\\Externals_2019\\gtestlib\\gtestlib\\include -DJSON_SPIRIT_LIB_DIR=D:\\work\\shared\\json_spirit\\x64\\Release -DBOOST_LIB_DIR=D:\\work\\shared\\MSVC2019\\UPG\\Externals_2019\\boost\\Release-x64\\lib  -DGTEST_LIB_DIR=D:\\work\\shared\\MSVC2019\\UPG\\Externals_2019\\gtestlib\\x64\\Release -DTINY_XML_LIB_DIR=D:\\work\\shared\\MSVC2019\\UPG\\Externals_2019\\tinyxml\\x64\\Release",
       "buildCommandArgs": "-v",
       "ctestCommandArgs": "",
       "inheritEnvironments": [ "msvc_x64_x64" ],
+      "variables": []
+    },
+    {
+      "name": "x86-Release",
+      "generator": "Ninja",
+      "configurationType": "Release",
+      "buildRoot": "${projectDir}\\out\\build\\release-win32-${name}",
+      "installRoot": "${projectDir}\\out\\install\\${name}",
+      "cmakeCommandArgs": "-DCMAKE_CXX_FLAGS_RELEASE=\"/MT\" -DBoost_INCLUDE_DIR=D:\\work\\shared\\MSVC2019\\UPG\\Externals_2019\\boost\\Release-Win32\\include\\boost-1_72 -DJSON_SPIRIT_INCLUDE_DIR=D:\\work\\shared\\json_spirit -DTINY_XML_INCLUDE_DIR=D:\\work\\shared\\MSVC2019\\UPG\\Externals_2019\\tinyxml -DGTEST_INCLUDE_DIR=D:\\work\\shared\\MSVC2019\\UPG\\Externals_2019\\gtestlib\\gtestlib\\include -DJSON_SPIRIT_LIB_DIR=D:\\work\\shared\\json_spirit\\Win32\\Release -DBOOST_LIB_DIR=D:\\work\\shared\\MSVC2019\\UPG\\Externals_2019\\boost\\Release-Win32\\lib  -DGTEST_LIB_DIR=D:\\work\\shared\\MSVC2019\\UPG\\Externals_2019\\gtestlib\\Win32\\Release -DTINY_XML_LIB_DIR=D:\\work\\shared\\MSVC2019\\UPG\\Externals_2019\\tinyxml\\Win32\\Release",
+      "buildCommandArgs": "-v",
+      "ctestCommandArgs": "",
+      "inheritEnvironments": [ "msvc_x86" ],
+      "variables": []
+    },
+    {
+      "name": "x86-Debug",
+      "generator": "Ninja",
+      "configurationType": "Debug",
+      "buildRoot": "${projectDir}\\out\\build\\debug-win32-${name}",
+      "installRoot": "${projectDir}\\out\\install\\${name}",
+      "cmakeCommandArgs": "-DCMAKE_CXX_FLAGS_DEBUG=\"/MT\" -DBoost_INCLUDE_DIR=D:\\work\\shared\\MSVC2019\\UPG\\Externals_2019\\boost\\Debug-Win32\\include\\boost-1_72 -DJSON_SPIRIT_INCLUDE_DIR=D:\\work\\shared\\json_spirit -DTINY_XML_INCLUDE_DIR=D:\\work\\shared\\MSVC2019\\UPG\\Externals_2019\\tinyxml -DGTEST_INCLUDE_DIR=D:\\work\\shared\\MSVC2019\\UPG\\Externals_2019\\gtestlib\\gtestlib\\include -DJSON_SPIRIT_LIB_DIR=D:\\work\\shared\\json_spirit\\Win32\\Debug -DBOOST_LIB_DIR=D:\\work\\shared\\MSVC2019\\UPG\\Externals_2019\\boost\\Debug-Win32\\lib  -DGTEST_LIB_DIR=D:\\work\\shared\\MSVC2019\\UPG\\Externals_2019\\gtestlib\\Win32\\Debug -DTINY_XML_LIB_DIR=D:\\work\\shared\\MSVC2019\\UPG\\Externals_2019\\tinyxml\\Win32\\Debug",
+      "buildCommandArgs": "-v",
+      "ctestCommandArgs": "",
+      "inheritEnvironments": [ "msvc_x86" ],
       "variables": []
     }
   ]
