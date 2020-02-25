@@ -1,0 +1,28 @@
+﻿{
+  "configurations": [
+    {
+      "name": "x64-Debug",
+      "generator": "Ninja",
+      "configurationType": "Debug",
+      "inheritEnvironments": [ "msvc_x64_x64" ],
+      "buildRoot": "${projectDir}\\out\\build\\debug-${name}",
+      "installRoot": "${projectDir}\\out\\install\\${name}",
+      "cmakeCommandArgs": "-DCMAKE_CXX_FLAGS_RELEASE=\"/MT\" -DCMAKE_CXX_FLAGS_DEBUG=\"/MTd\" -DBoost_INCLUDE_DIR=D:\\work\\shared\\MSVC2019\\UPG\\Externals_2019\\boost\\Debug-x64\\include\\boost-1_72 -DJSON_SPIRIT_INCLUDE_DIR=D:\\work\\shared\\json_spirit -DTINY_XML_INCLUDE_DIR=D:\\work\\shared\\MSVC2019\\UPG\\Externals_2019\\tinyxml -DGTEST_INCLUDE_DIR=D:\\work\\shared\\MSVC2019\\UPG\\Externals_2019\\gtestlib\\gtestlib\\include -DJSON_SPIRIT_LIB_DIR=D:\\work\\shared\\json_spirit\\x64\\Debug -DBOOST_LIB_DIR=D:\\work\\shared\\MSVC2019\\UPG\\Externals_2019\\boost\\Debug-x64\\lib  -DGTEST_LIB_DIR=D:\\work\\shared\\MSVC2019\\UPG\\Externals_2019\\gtestlib\\x64\\Debug -DTINY_XML_LIB_DIR=D:\\work\\shared\\MSVC2019\\UPG\\Externals_2019\\tinyxml\\x64\\Debug",
+      "buildCommandArgs": "-v",
+      "ctestCommandArgs": "",
+      "variables": []
+    },
+    {
+      "name": "x64-Release",
+      "generator": "Ninja",
+      "configurationType": "Release",
+      "buildRoot": "${projectDir}\\out\\build\\release-${name}",
+      "installRoot": "${projectDir}\\out\\install\\${name}",
+      "cmakeCommandArgs": "-DCMAKE_CXX_FLAGS_RELEASE=\"/MT\" -DBoost_INCLUDE_DIR=D:\\work\\shared\\MSVC2019\\UPG\\Externals_2019\\boost\\Release-x64\\include\\boost-1_72 -DJSON_SPIRIT_INCLUDE_DIR=D:\\work\\shared\\json_spirit -DTINY_XML_INCLUDE_DIR=D:\\work\\shared\\MSVC2019\\UPG\\Externals_2019\\tinyxml -DGTEST_INCLUDE_DIR=D:\\work\\shared\\MSVC2019\\UPG\\Externals_2019\\gtestlib\\gtestlib\\include -DJSON_SPIRIT_LIB_DIR=D:\\work\\shared\\json_spirit\\x64\\Release -DBOOST_LIB_DIR=D:\\work\\shared\\MSVC2019\\UPG\\Externals_2019\\boost\\Release-x64\\lib  -DGTEST_LIB_DIR=D:\\work\\shared\\MSVC2019\\UPG\\Externals_2019\\gtestlib\\x64\\Release -DTINY_XML_LIB_DIR=D:\\work\\shared\\MSVC2019\\UPG\\Externals_2019\\tinyxml\\x64\\Release",
+      "buildCommandArgs": "-v",
+      "ctestCommandArgs": "",
+      "inheritEnvironments": [ "msvc_x64_x64" ],
+      "variables": []
+    }
+  ]
+}
