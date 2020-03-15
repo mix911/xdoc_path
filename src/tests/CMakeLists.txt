@@ -1,4 +1,6 @@
-find_package(Boost 1.72.0)
+find_package(Boost)
+#find_package(TinyXML2 REQUIRED)
+
 include_directories(${Boost_INCLUDE_DIRS})
 include_directories(${JSON_SPIRIT_INCLUDE_DIR})
 include_directories(${TINY_XML_INCLUDE_DIR})
